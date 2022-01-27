@@ -1,8 +1,10 @@
 using System;
+using System.Runtime.CompilerServices;
 using Dissonance.Integrations.FishNet.Constants;
 using FishNet.Broadcast;
 using FishNet.Utility.Performance;
 using Unity.Collections.LowLevel.Unsafe;
+using UnityEngine;
 
 namespace Dissonance.Integrations.FishNet.Broadcasts
 {
@@ -14,6 +16,9 @@ namespace Dissonance.Integrations.FishNet.Broadcasts
 
         public DissonanceFishNetBroadcast(ArraySegment<byte> originalData)
         {
+            if (!EnsurePacketSize(originalData.Count))
+                return;
+
             byte[] rentedArray = ByteArrayPool.Retrieve(originalData.Count);
 
 #if DISSONANCE_FOR_FISHNET_UNSAFE
@@ -39,6 +44,20 @@ namespace Dissonance.Integrations.FishNet.Broadcasts
             // If array is not null, then return it to pool
             if(Payload.Array != null)
                 ByteArrayPool.Store(Payload.Array);
+        }
+
+        // Method used to ensure that packets are within Packet treshold
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static bool EnsurePacketSize(int dataCount)
+        {
+            if (dataCount > DissonanceFishNetConstants.PacketSizeThreshold)
+            {
+                Debug.LogWarning("Attempted to send packet of size: " + dataCount + 
+                                 "; max packet size is: " + DissonanceFishNetConstants.PacketSizeThreshold + "!");
+                return false;
+            }
+
+            return true;
         }
     }
 }
