@@ -1,4 +1,6 @@
 using System.Runtime.CompilerServices;
+using Dissonance.Integrations.FishNet.Exceptions;
+using FishNet.Connection;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
 using UnityEngine;
@@ -9,7 +11,10 @@ namespace Dissonance.Integrations.FishNet
     public sealed class DissonanceFishNetPlayer : NetworkBehaviour, IDissonancePlayer
     {
         // SyncVar ensures that all observers know player ID, even late joiners
-        [SyncVar] private string _syncedPlayerId;
+        [SyncVar(OnChange = nameof(OnPlayerIdHookFired))] private string _syncedPlayerId;
+
+        // Captured DissonanceComms instance
+        private DissonanceComms _comms;
 
         public string PlayerId
         {
@@ -37,5 +42,46 @@ namespace Dissonance.Integrations.FishNet
         public NetworkPlayerType Type => IsOwner ? NetworkPlayerType.Local : NetworkPlayerType.Remote;
 
         public bool IsTracking { get; private set; }
+
+
+        // Called by FishNet when object is spawned on client with authority
+        public override void OnOwnershipClient(NetworkConnection prevOwner)
+        {
+            base.OnOwnershipClient(prevOwner);
+            
+            DissonanceFishNetComms fishNetComms = DissonanceFishNetComms.Instance;
+            if(fishNetComms == null)
+                throw new DissonanceFishNetException("Could not find DissonanceFishNetComms GameObject!");
+            
+            if(fishNetComms.Comms == null)
+                throw new DissonanceFishNetException("Could not find DissonanceComms GameObject!");
+
+            _comms = fishNetComms.Comms;
+            _comms.LocalPlayerName = OwnerId.ToString();
+            _comms.TrackPlayerPosition(this);
+        }
+
+        // Sets Player ID to owner ID
+        public override void OnStartServer()
+        {
+            base.OnStartServer();
+            _syncedPlayerId = OwnerId.ToString();
+        }
+
+        // Invoked when Player ID changes (or is set by server)
+        private void OnPlayerIdHookFired(string _, string __)
+        {
+            if (_comms == null)
+                return;
+            
+            if (IsTracking)
+            {
+                _comms.StopTracking(this);
+                IsTracking = false;
+            }
+            
+            _comms.TrackPlayerPosition(this);
+            IsTracking = true;
+        }
     }
 }

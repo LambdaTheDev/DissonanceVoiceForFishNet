@@ -63,14 +63,8 @@ namespace Dissonance.Integrations.FishNet
         // Called when FishNet client connects or disconnects
         private void FishNetServerOnOnRemoteConnectionState(NetworkConnection fishNetConnection, RemoteConnectionStateArgs newState)
         {
-            // New client connected
-            if (newState.ConnectionState == RemoteConnectionStates.Started)
-            {
-                // todo: Add client should be here... but how to call it... properly?
-            }
-            
             // Client disconnected
-            else if (newState.ConnectionState == RemoteConnectionStates.Stopped)
+            if (newState.ConnectionState == RemoteConnectionStates.Stopped)
             {
                 DissonanceFishNetConnection dissonanceConnection = new DissonanceFishNetConnection(fishNetConnection);
                 ClientDisconnected(dissonanceConnection);
