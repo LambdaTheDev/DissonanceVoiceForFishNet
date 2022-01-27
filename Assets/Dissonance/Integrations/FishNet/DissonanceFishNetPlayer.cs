@@ -69,7 +69,7 @@ namespace Dissonance.Integrations.FishNet
         }
 
         // Invoked when Player ID changes (or is set by server)
-        private void OnPlayerIdHookFired(string _, string __)
+        private void OnPlayerIdHookFired(string _, string __, bool asServer)
         {
             if (_comms == null)
                 return;

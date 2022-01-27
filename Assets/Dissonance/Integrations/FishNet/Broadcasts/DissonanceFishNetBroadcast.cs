@@ -14,10 +14,11 @@ namespace Dissonance.Integrations.FishNet.Broadcasts
 
         public DissonanceFishNetBroadcast(ArraySegment<byte> originalData)
         {
+            byte[] rentedArray = ByteArrayPool.Retrieve(originalData.Count);
+
+#if DISSONANCE_FOR_FISHNET_UNSAFE
             unsafe
             {
-                byte[] rentedArray = ByteArrayPool.Retrieve(DissonanceFishNetConstants.MaxPacketSize);
-              
                 // Copy original data content to rented byte array
                 fixed(byte* rentedPtr = rentedArray)
                 fixed (byte* originalPtr = &originalData.Array[originalData.Offset])
@@ -25,10 +26,15 @@ namespace Dissonance.Integrations.FishNet.Broadcasts
                     UnsafeUtility.MemCpy(rentedPtr, originalPtr, originalData.Count);
                 }
             }
+            
+            return;
+#endif
+            
+            Buffer.BlockCopy(originalData.Array, originalData.Offset, rentedArray, 0, originalData.Count);
         }
 
         // Returns buffer content
-        public void RelaseBuffer()
+        public void ReleaseBuffer()
         {
             // If array is not null, then return it to pool
             if(Payload.Array != null)

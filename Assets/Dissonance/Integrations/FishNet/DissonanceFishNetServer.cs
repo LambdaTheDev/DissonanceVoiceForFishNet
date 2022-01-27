@@ -57,7 +57,7 @@ namespace Dissonance.Integrations.FishNet
             // Wrap FishNet connection into Dissonance one, pass a packet & release buffer
             DissonanceFishNetConnection dissonanceConn = new DissonanceFishNetConnection(connection);
             NetworkReceivedPacket(dissonanceConn, broadcast.Payload);
-            broadcast.RelaseBuffer();
+            broadcast.ReleaseBuffer();
         }
         
         // Called when FishNet client connects or disconnects

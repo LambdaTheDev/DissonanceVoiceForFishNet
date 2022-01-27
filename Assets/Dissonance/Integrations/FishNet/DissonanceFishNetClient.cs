@@ -59,7 +59,7 @@ namespace Dissonance.Integrations.FishNet
         {
             // I implemented IDisposable there for QOL proposes
             NetworkReceivedPacket(broadcast.Payload);
-            broadcast.RelaseBuffer();
+            broadcast.ReleaseBuffer();
         }
     }
 }
