@@ -17,7 +17,10 @@ namespace Dissonance.Integrations.FishNet.Broadcasts
         public DissonanceFishNetBroadcast(ArraySegment<byte> originalData)
         {
             if (!EnsurePacketSize(originalData.Count))
+            {
+                Payload = default;
                 return;
+            }
 
             byte[] rentedArray = ByteArrayPool.Retrieve(originalData.Count);
 
