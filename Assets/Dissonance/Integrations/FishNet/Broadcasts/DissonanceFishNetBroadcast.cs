@@ -36,6 +36,7 @@ namespace Dissonance.Integrations.FishNet.Broadcasts
 #endif
             
             Buffer.BlockCopy(originalData.Array, originalData.Offset, rentedArray, 0, originalData.Count);
+            Payload = new ArraySegment<byte>(rentedArray, 0, originalData.Count);
         }
 
         // Returns buffer content
