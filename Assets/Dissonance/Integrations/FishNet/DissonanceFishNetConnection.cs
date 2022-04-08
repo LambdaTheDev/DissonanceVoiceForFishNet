@@ -30,12 +30,22 @@ namespace Dissonance.Integrations.FishNet
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(DissonanceFishNetConnection other)
         {
-            return Equals(FishNetConnection, other.FishNetConnection);
+            if (FishNetConnection == null)
+            {
+                if (other.FishNetConnection == null)
+                    return true;
+                return false;
+            }
+
+            return FishNetConnection.Equals(other.FishNetConnection);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override bool Equals(object obj)
         {
+            if (ReferenceEquals(null, obj))
+                return false;
+
             return obj is DissonanceFishNetConnection other && Equals(other);
         }
 
