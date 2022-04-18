@@ -37,7 +37,7 @@ namespace Dissonance.Integrations.FishNet
 		}
 
 		// Check if a connection is actually connected
-		private static bool IsConnected([NotNull] NetworkConnection conn)
+		private static bool IsConnected(NetworkConnection conn)
 		{
 			return conn.FirstObject != null && conn.IsActive && InstanceFinder.ServerManager.Clients.ContainsKey(conn.ClientId);
 		}
@@ -65,8 +65,7 @@ namespace Dissonance.Integrations.FishNet
 			}
 		}
 
-		// I am unsure if I need it. Docs say that this method polls Dissonance-related packets.
-		// If something won't work with networking, etc, I will take more care for this method...
+        // Not needed in FishNet
 		protected override void ReadMessages() { }
 
 		// Callback when Dissonance broadcast arrives

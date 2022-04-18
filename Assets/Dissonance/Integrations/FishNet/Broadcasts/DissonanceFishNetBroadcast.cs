@@ -52,7 +52,7 @@ namespace Dissonance.Integrations.FishNet.Broadcasts
 				ByteArrayPool.Store(Payload.Array);
 		}
 
-		// Method used to ensure that packets are within Packet treshold
+		// Method used to ensure that packets are within Packet threshold
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		private static bool EnsurePacketSize(int dataCount)
 		{
@@ -69,13 +69,13 @@ namespace Dissonance.Integrations.FishNet.Broadcasts
 
 	public static class DissonanceFishNetBroadcastExtensions
 	{
-		public static void WriteDissonanceFishNetBroadcast([NotNull] this Writer writer, DissonanceFishNetBroadcast value)
+		public static void WriteDissonanceFishNetBroadcast(this Writer writer, DissonanceFishNetBroadcast value)
 		{
 			writer.WriteUInt16((ushort)value.Payload.Count);
 			writer.WriteBytes(value.Payload.Array, value.Payload.Offset, value.Payload.Count);
 		}
 
-		public static DissonanceFishNetBroadcast ReadDissonanceFishNetBroadcast([NotNull] this Reader reader)
+		public static DissonanceFishNetBroadcast ReadDissonanceFishNetBroadcast(this Reader reader)
 		{
 			var length = reader.ReadUInt16();
 			var arr = ByteArrayPool.Retrieve(length);

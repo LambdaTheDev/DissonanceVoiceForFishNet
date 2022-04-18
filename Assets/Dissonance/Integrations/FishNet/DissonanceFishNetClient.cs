@@ -58,7 +58,7 @@ namespace Dissonance.Integrations.FishNet
 			InstanceFinder.ClientManager.Broadcast(broadcast, Channel.Unreliable);
 		}
 
-		// Look at this method equivalent in DissFishNetServer for more info why it's empty
+        // Not needed in FishNet
 		protected override void ReadMessages() { }
 
 		// Callback when Dissonance broadcasts arrives

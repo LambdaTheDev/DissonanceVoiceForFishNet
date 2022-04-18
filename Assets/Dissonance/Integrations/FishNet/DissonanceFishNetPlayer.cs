@@ -57,7 +57,6 @@ namespace Dissonance.Integrations.FishNet
                 throw new DissonanceFishNetException("Could not find DissonanceComms GameObject!");
 
             _comms = fishNetComms.Comms;
-            _comms.LocalPlayerName = OwnerId.ToString();
             _comms.TrackPlayerPosition(this);
         }
 
