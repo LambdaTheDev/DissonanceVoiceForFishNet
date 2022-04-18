@@ -1,0 +1,17 @@
+{
+    "name": "DissonanceVoip.FishNet",
+    "rootNamespace": "",
+    "references": [
+        "GUID:61106e8dfb7a4e64a96af0eccfe1209f",
+        "GUID:7c88a4a7926ee5145ad2dfa06f454c67"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
