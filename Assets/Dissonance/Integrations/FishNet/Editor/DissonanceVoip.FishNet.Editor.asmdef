@@ -1,0 +1,21 @@
+{
+    "name": "DissonanceVoip.FishNet.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:61106e8dfb7a4e64a96af0eccfe1209f",
+        "GUID:e9244de365e87924c955165fd5894cf4",
+        "GUID:e490e8c2200334e0db84d14f10570995",
+        "GUID:7c88a4a7926ee5145ad2dfa06f454c67"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
