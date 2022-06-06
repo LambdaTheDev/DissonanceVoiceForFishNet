@@ -1,4 +1,3 @@
-using System;
 using Dissonance.Integrations.FishNet.Broadcasts;
 using Dissonance.Integrations.FishNet.Constants;
 using Dissonance.Networking;

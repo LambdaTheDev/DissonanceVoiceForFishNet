@@ -30,13 +30,6 @@ namespace Dissonance.Integrations.FishNet
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(DissonanceFishNetConnection other)
         {
-            if (FishNetConnection == null)
-            {
-                if (other.FishNetConnection == null)
-                    return true;
-                return false;
-            }
-
             return FishNetConnection.Equals(other.FishNetConnection);
         }
 
@@ -52,7 +45,7 @@ namespace Dissonance.Integrations.FishNet
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override int GetHashCode()
         {
-            return (FishNetConnection != null ? FishNetConnection.GetHashCode() : 0);
+            return FishNetConnection.GetHashCode();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

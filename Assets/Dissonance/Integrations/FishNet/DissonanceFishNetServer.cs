@@ -1,11 +1,9 @@
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using Dissonance.Integrations.FishNet.Broadcasts;
 using Dissonance.Networking;
 using FishNet;
 using FishNet.Connection;
-using FishNet.Managing.Server;
 using FishNet.Transporting;
 
 namespace Dissonance.Integrations.FishNet
@@ -35,34 +33,23 @@ namespace Dissonance.Integrations.FishNet
 			}
 			base.Disconnect();
 		}
-
-		// Check if a connection is actually connected
-		private static bool IsConnected(NetworkConnection conn)
-		{
-			return conn.FirstObject != null && conn.IsActive && InstanceFinder.ServerManager.Clients.ContainsKey(conn.ClientId);
-		}
-
-
+		
 		// Sends data in a reliable way. Aggressive inlined due to it's just a wrapper
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		protected override void SendReliable(DissonanceFishNetConnection connection, ArraySegment<byte> packet)
 		{
-			if (IsConnected(connection.FishNetConnection))
-			{
-				DissonanceFishNetBroadcast broadcast = new DissonanceFishNetBroadcast(packet);
-				connection.FishNetConnection.Broadcast(broadcast);
-			}
+			if (!connection.FishNetConnection.IsActive) return;
+			DissonanceFishNetBroadcast broadcast = new DissonanceFishNetBroadcast(packet);
+			connection.FishNetConnection.Broadcast(broadcast);
 		}
 
 		// Sends data in an unreliable way. Aggressive inlined due to it's just a wrapper
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		protected override void SendUnreliable(DissonanceFishNetConnection connection, ArraySegment<byte> packet)
 		{
-			if (IsConnected(connection.FishNetConnection))
-			{
-				DissonanceFishNetBroadcast broadcast = new DissonanceFishNetBroadcast(packet);
-				connection.FishNetConnection.Broadcast(broadcast, true, Channel.Unreliable);
-			}
+			if (!connection.FishNetConnection.IsActive) return;
+			DissonanceFishNetBroadcast broadcast = new DissonanceFishNetBroadcast(packet);
+			connection.FishNetConnection.Broadcast(broadcast, true, Channel.Unreliable);
 		}
 
         // Not needed in FishNet
@@ -81,11 +68,9 @@ namespace Dissonance.Integrations.FishNet
 		private void FishNetServerOnOnRemoteConnectionState(NetworkConnection fishNetConnection, RemoteConnectionStateArgs newState)
 		{
 			// Client disconnected
-			if (newState.ConnectionState == RemoteConnectionStates.Stopped)
-			{
-				DissonanceFishNetConnection dissonanceConnection = new DissonanceFishNetConnection(fishNetConnection);
-				ClientDisconnected(dissonanceConnection);
-			}
+			if (newState.ConnectionState != RemoteConnectionStates.Stopped) return;
+			DissonanceFishNetConnection dissonanceConnection = new DissonanceFishNetConnection(fishNetConnection);
+			ClientDisconnected(dissonanceConnection);
 		}
 	}
 }

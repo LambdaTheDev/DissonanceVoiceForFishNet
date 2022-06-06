@@ -1,44 +1,51 @@
+using System;
+using FishNet;
 using FishNet.Managing;
 using FishNet.Managing.Scened;
 using FishNet.Transporting;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using SceneManager = FishNet.Managing.Scened.SceneManager;
 
-namespace Assets.Dissonance.Integrations.FishNet.Demo
+namespace Dissonance.Integrations.FishNet.Demo
 {
-    public class MenuController
-        : MonoBehaviour
+    public class MenuController : MonoBehaviour
     {
+        public Text errorMessage;
+        public GameObject[] hideOnClick;
+        
         private NetworkManager _networkManager;
-        public Text ErrorMessage;
 
-        public GameObject[] HideOnClick;
-
+        
         private void Start()
         {
-            _networkManager = FindObjectOfType<NetworkManager>();
+            _networkManager = InstanceFinder.NetworkManager;
             _networkManager.ServerManager.OnServerConnectionState += ServerManager_OnServerConnectionState;
             _networkManager.ClientManager.OnClientConnectionState += ClientManager_OnClientConnectionState;
         }
 
+        private void OnDestroy()
+        {
+            if (_networkManager == null) return;
+            _networkManager.ServerManager.OnServerConnectionState -= ServerManager_OnServerConnectionState;
+            _networkManager.ClientManager.OnClientConnectionState -= ClientManager_OnClientConnectionState;
+        }
+
         private void HideAll()
         {
-            if (HideOnClick == null)
+            if (hideOnClick == null)
                 return;
 
-            foreach (var item in HideOnClick)
+            foreach (var item in hideOnClick)
                 item.SetActive(false);
         }
 
         private void ShowError(string message)
         {
-            if (ErrorMessage == null)
+            if (errorMessage == null)
                 return;
 
-            ErrorMessage.text = message;
-            ErrorMessage.gameObject.SetActive(true);
+            errorMessage.text = message;
+            errorMessage.gameObject.SetActive(true);
         }
 
         public void OnClickStartClient()
