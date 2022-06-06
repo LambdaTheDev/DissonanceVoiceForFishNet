@@ -4,5 +4,11 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Dissonance/Integrations/FishNet/Demo/FishNet Demo.unity
+    guid: f9669d47f45a32442a68550df2b9c365
+  - enabled: 1
+    path: Assets/Dissonance/Integrations/FishNet/Demo/FishNet Dissonance GameWorld.unity
+    guid: cac31d74840d56b41b07639f1b97e1bd
   m_configObjects: {}
