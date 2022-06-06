@@ -51,6 +51,7 @@ namespace Dissonance.Integrations.FishNet
 			return new DissonanceFishNetClient(this);
 		}
 
+		// I'd like to get rid of this & rely on FishNet callbacks, but first I will make it work, then I'm gonna upgrade it
 		private void UpdateNetwork()
 		{
 			// Check if Dissonance is ready
