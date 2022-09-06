@@ -68,7 +68,7 @@ namespace Dissonance.Integrations.FishNet
 		private void FishNetServerOnOnRemoteConnectionState(NetworkConnection fishNetConnection, RemoteConnectionStateArgs newState)
 		{
 			// Client disconnected
-			if (newState.ConnectionState != RemoteConnectionStates.Stopped) return;
+			if (newState.ConnectionState != RemoteConnectionState.Stopped) return;
 			DissonanceFishNetConnection dissonanceConnection = new DissonanceFishNetConnection(fishNetConnection);
 			ClientDisconnected(dissonanceConnection);
 		}
