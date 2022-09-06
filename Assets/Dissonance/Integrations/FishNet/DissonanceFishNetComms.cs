@@ -14,8 +14,8 @@ namespace Dissonance.Integrations.FishNet
 		public static DissonanceFishNetComms Instance { get; private set; }
 
 		public DissonanceComms Comms { get; private set; }
-
-        private NetworkManager _networkManager;
+        internal NetworkManager NetworkManager { get; private set; }
+        
         private bool _subscribed;
 
 
@@ -31,15 +31,15 @@ namespace Dissonance.Integrations.FishNet
             // Initialize this comms instance & log
 			Instance = this;
 			Comms = GetComponent<DissonanceComms>();
-            _networkManager = InstanceFinder.NetworkManager;
+            NetworkManager = InstanceFinder.NetworkManager;
             LoggingHelper.Logger.Info("FishNet comms initialized successfully!");
         }
 
 		protected override void Initialize()
 		{
             // Register no broadcast handler so errors can be captured easier
-            _networkManager.ServerManager.RegisterBroadcast<DissonanceFishNetBroadcast>(NullBroadcastReceivedHandler);
-			_networkManager.ClientManager.RegisterBroadcast<DissonanceFishNetBroadcast>(NullBroadcastReceivedHandler);
+            NetworkManager.ServerManager.RegisterBroadcast<DissonanceFishNetBroadcast>(NullBroadcastReceivedHandler);
+			NetworkManager.ClientManager.RegisterBroadcast<DissonanceFishNetBroadcast>(NullBroadcastReceivedHandler);
 
             // Subscribe to NetworkManager events & log
             ManageNetworkEvents(true);
@@ -49,7 +49,7 @@ namespace Dissonance.Integrations.FishNet
 		protected override DissonanceFishNetServer CreateServer(Unit connectionParameters)
 		{
             LoggingHelper.Logger.Trace("Creating FishNet server...");
-			return new DissonanceFishNetServer();
+			return new DissonanceFishNetServer(this);
 		}
 
 		protected override DissonanceFishNetClient CreateClient(Unit connectionParameters)
@@ -63,15 +63,15 @@ namespace Dissonance.Integrations.FishNet
         {
             if (subscribe && !_subscribed)
             {
-                _networkManager.ServerManager.OnServerConnectionState += ServerManagerOnOnServerConnectionState;
-                _networkManager.ClientManager.OnClientConnectionState += ClientManagerOnOnClientConnectionState;
+                NetworkManager.ServerManager.OnServerConnectionState += ServerManagerOnOnServerConnectionState;
+                NetworkManager.ClientManager.OnClientConnectionState += ClientManagerOnOnClientConnectionState;
 
                 _subscribed = true;
             }
             else if(!subscribe && _subscribed)
             {
-                _networkManager.ServerManager.OnServerConnectionState -= ServerManagerOnOnServerConnectionState;
-                _networkManager.ClientManager.OnClientConnectionState -= ClientManagerOnOnClientConnectionState;
+                NetworkManager.ServerManager.OnServerConnectionState -= ServerManagerOnOnServerConnectionState;
+                NetworkManager.ClientManager.OnClientConnectionState -= ClientManagerOnOnClientConnectionState;
 
                 _subscribed = false;
             }
@@ -99,14 +99,14 @@ namespace Dissonance.Integrations.FishNet
             if (obj.ConnectionState == LocalConnectionState.Started)
             {
                 // Run host or dedicated server
-                if (_networkManager.IsHost)
+                if (NetworkManager.IsHost)
                     RunAsHost(Unit.None, Unit.None);
                 
                 else
                     RunAsDedicatedServer(Unit.None);
 
                 // Log
-                LoggingHelper.RunningAs(_networkManager.IsHost ? NetworkMode.Host : NetworkMode.DedicatedServer);
+                LoggingHelper.RunningAs(NetworkManager.IsHost ? NetworkMode.Host : NetworkMode.DedicatedServer);
             }
             else if (obj.ConnectionState == LocalConnectionState.Stopped)
             {
@@ -115,7 +115,7 @@ namespace Dissonance.Integrations.FishNet
                 ManageNetworkEvents(false);
                 
                 // Log
-                LoggingHelper.StoppingAs(_networkManager.IsHost ? NetworkMode.Host : NetworkMode.DedicatedServer);
+                LoggingHelper.StoppingAs(NetworkManager.IsHost ? NetworkMode.Host : NetworkMode.DedicatedServer);
             }
         }
 

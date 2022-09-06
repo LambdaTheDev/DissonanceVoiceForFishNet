@@ -3,9 +3,11 @@ using FishNet.Object;
 using FishNet.Object.Synchronizing;
 using UnityEngine;
 
-namespace Dissonance.Integrations.FishNet{
+namespace Dissonance.Integrations.FishNet
+{
     // A Player object wrapper for Dissonance Voice
-    public sealed class DissonanceFishNetPlayer : NetworkBehaviour, IDissonancePlayer{
+    public sealed class DissonanceFishNetPlayer : NetworkBehaviour, IDissonancePlayer
+    {
         private DissonanceComms _comms;
 
         public bool IsTracking { get; private set; }
@@ -147,6 +149,5 @@ namespace Dissonance.Integrations.FishNet{
                 IsTracking = false;
             }
         }
-
     }
 }

@@ -5,14 +5,14 @@ namespace Dissonance.Integrations.FishNet.Utils
     // Helper class for Dissonance events logging
     internal static class LoggingHelper
     {
-        public static readonly Log Logger = Logs.Create(LogCategory.Network, "FishNet integration");
+        public static readonly Log Logger = Logs.Create(LogCategory.Network, "FishNet");
 
-        private const string RunningAsTemplate = "Running integration as: {0}!";
+        private const string RunningAsTemplate = "Running as: {0}!";
         private static readonly string RunningAsClient = string.Format(RunningAsTemplate, "CLIENT");
         private static readonly string RunningAsServer = string.Format(RunningAsTemplate, "SERVER");
         private static readonly string RunningAsHost = string.Format(RunningAsTemplate, "HOST");
 
-        private const string StoppingAsTemplate = "Stopping integration as: {0}!";
+        private const string StoppingAsTemplate = "Stopping as: {0}!";
         private static readonly string StoppingAsClient = string.Format(StoppingAsTemplate, "CLIENT");
         private static readonly string StoppingAsServer = string.Format(StoppingAsTemplate, "SERVER");
         private static readonly string StoppingAsHost = string.Format(StoppingAsTemplate, "HOST");
@@ -23,15 +23,15 @@ namespace Dissonance.Integrations.FishNet.Utils
             switch (mode)
             {
                 case NetworkMode.Client:
-                    Logger.Debug(RunningAsClient);
+                    Logger.Info(RunningAsClient);
                     break;
 
                 case NetworkMode.DedicatedServer:
-                    Logger.Debug(RunningAsServer);
+                    Logger.Info(RunningAsServer);
                     break;
 
                 case NetworkMode.Host:
-                    Logger.Debug(RunningAsHost);
+                    Logger.Info(RunningAsHost);
                     break;
             }
         }
@@ -41,15 +41,15 @@ namespace Dissonance.Integrations.FishNet.Utils
             switch (mode)
             {
                 case NetworkMode.Client:
-                    Logger.Debug(StoppingAsClient);
+                    Logger.Info(StoppingAsClient);
                     break;
 
                 case NetworkMode.DedicatedServer:
-                    Logger.Debug(StoppingAsServer);
+                    Logger.Info(StoppingAsServer);
                     break;
 
                 case NetworkMode.Host:
-                    Logger.Debug(StoppingAsHost);
+                    Logger.Info(StoppingAsHost);
                     break;
             }        
         }

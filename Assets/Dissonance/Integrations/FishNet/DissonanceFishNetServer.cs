@@ -1,6 +1,7 @@
 using System;
 using System.Runtime.CompilerServices;
 using Dissonance.Integrations.FishNet.Broadcasts;
+using Dissonance.Integrations.FishNet.Utils;
 using Dissonance.Networking;
 using FishNet;
 using FishNet.Connection;
@@ -10,21 +11,31 @@ namespace Dissonance.Integrations.FishNet
 {
 	// A Server integration for Dissonance Voice
 	public sealed class DissonanceFishNetServer : BaseServer<DissonanceFishNetServer, DissonanceFishNetClient, DissonanceFishNetConnection>
-	{
+    {
+        private readonly DissonanceFishNetComms _fishNetComms;
+
+
+        public DissonanceFishNetServer(DissonanceFishNetComms network)
+        {
+            _fishNetComms = network;
+        }
+        
 		// Registers Dissonance data broadcast & subscribes to NetworkManager events
 		public override void Connect()
 		{
-			var serverManager = InstanceFinder.ServerManager;
+			var serverManager = _fishNetComms.NetworkManager.ServerManager;
 			serverManager.UnregisterBroadcast<DissonanceFishNetBroadcast>(DissonanceFishNetComms.NullBroadcastReceivedHandler);
 			serverManager.RegisterBroadcast<DissonanceFishNetBroadcast>(OnDissonanceDataReceived);
 			serverManager.OnRemoteConnectionState += FishNetServerOnOnRemoteConnectionState;
 			base.Connect();
+            
+            LoggingHelper.Logger.Debug("Connecting server...");
 		}
 
 		// Unregister Dissonance data broadcast & unsubscribes from NetworkManager events
 		public override void Disconnect()
 		{
-			var serverManager = InstanceFinder.ServerManager;
+			var serverManager = _fishNetComms.NetworkManager.ServerManager;
 			if (serverManager != null)
 			{
 				serverManager.UnregisterBroadcast<DissonanceFishNetBroadcast>(OnDissonanceDataReceived);
@@ -32,6 +43,8 @@ namespace Dissonance.Integrations.FishNet
 				serverManager.OnRemoteConnectionState -= FishNetServerOnOnRemoteConnectionState;
 			}
 			base.Disconnect();
+            
+            LoggingHelper.Logger.Debug("Disconnecting server...");
 		}
 		
 		// Sends data in a reliable way. Aggressive inlined due to it's just a wrapper
