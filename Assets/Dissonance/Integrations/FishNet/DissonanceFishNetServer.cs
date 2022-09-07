@@ -29,7 +29,7 @@ namespace Dissonance.Integrations.FishNet
 			serverManager.OnRemoteConnectionState += FishNetServerOnOnRemoteConnectionState;
 			base.Connect();
             
-            LoggingHelper.Logger.Debug("Connecting server...");
+            LoggingHelper.Logger.Debug("Server is ready!");
 		}
 
 		// Unregister Dissonance data broadcast & unsubscribes from NetworkManager events
@@ -44,7 +44,7 @@ namespace Dissonance.Integrations.FishNet
 			}
 			base.Disconnect();
             
-            LoggingHelper.Logger.Debug("Disconnecting server...");
+            LoggingHelper.Logger.Debug("Server stopped!");
 		}
 		
 		// Sends data in a reliable way. Aggressive inlined due to it's just a wrapper

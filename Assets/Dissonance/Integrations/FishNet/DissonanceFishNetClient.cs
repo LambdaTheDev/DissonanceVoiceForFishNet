@@ -28,7 +28,7 @@ namespace Dissonance.Integrations.FishNet
 			clientManager.RegisterBroadcast<DissonanceFishNetBroadcast>(OnDissonanceDataReceived);
 			Connected();
             
-            LoggingHelper.Logger.Debug("Connecting client...");
+            LoggingHelper.Logger.Debug("Client is ready!");
 		}
 
 		// Unregisters broadcast
@@ -42,7 +42,7 @@ namespace Dissonance.Integrations.FishNet
 			}
             
 			base.Disconnect();
-            LoggingHelper.Logger.Debug("Disconnecting client...");
+            LoggingHelper.Logger.Debug("Client disconnected!");
         }
 
 		// Sends data in a reliable way
