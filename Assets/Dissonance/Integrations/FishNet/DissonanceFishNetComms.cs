@@ -52,6 +52,13 @@ namespace Dissonance.Integrations.FishNet
             NetworkManager.ServerManager.RegisterBroadcast<DissonanceFishNetBroadcast>(NullBroadcastReceivedHandler);
 			NetworkManager.ClientManager.RegisterBroadcast<DissonanceFishNetBroadcast>(NullBroadcastReceivedHandler);
 
+            // If FishNet is offline, there is an error
+            if (NetworkManager.IsOffline)
+            {
+                LoggingHelper.Logger.Error("FishNet must be initialized before initializing Dissonance Voice chat!");
+                return;
+            }
+            
             // Now, start Dissonance Voice, depending on current FishNet state
             if (NetworkManager.IsServer)
             {
