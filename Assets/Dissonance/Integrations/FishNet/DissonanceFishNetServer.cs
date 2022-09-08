@@ -3,7 +3,6 @@ using System.Runtime.CompilerServices;
 using Dissonance.Integrations.FishNet.Broadcasts;
 using Dissonance.Integrations.FishNet.Utils;
 using Dissonance.Networking;
-using FishNet;
 using FishNet.Connection;
 using FishNet.Transporting;
 
@@ -84,6 +83,7 @@ namespace Dissonance.Integrations.FishNet
 			if (newState.ConnectionState != RemoteConnectionState.Stopped) return;
 			DissonanceFishNetConnection dissonanceConnection = new DissonanceFishNetConnection(fishNetConnection);
 			ClientDisconnected(dissonanceConnection);
-		}
+            LoggingHelper.Logger.Info("Remote client with ID: {0} has disconnected!", fishNetConnection.ClientId);
+        }
 	}
 }
