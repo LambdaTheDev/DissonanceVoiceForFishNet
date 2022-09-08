@@ -30,10 +30,16 @@ namespace Dissonance.Integrations.FishNet
             }
 
             // Initialize this comms instance & log
-			Instance = this;
 			Comms = GetComponent<DissonanceComms>();
             NetworkManager = InstanceFinder.NetworkManager;
-            LoggingHelper.Logger.Info("FishNet comms initialized successfully!");
+            
+            if(Comms == null)
+                LoggingHelper.Logger.Error("Could not find DissonanceComms component on this GameObject! This Comms object will not work.");
+            else
+            {
+                Instance = this;
+                LoggingHelper.Logger.Info("FishNet comms initialized successfully!");
+            }
         }
 
         private void OnEnable()
