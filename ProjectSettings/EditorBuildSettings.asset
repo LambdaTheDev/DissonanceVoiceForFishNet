@@ -6,9 +6,15 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Dissonance/Integrations/FishNet/Demos/Basic/FishNet Demo.unity
+    path: Assets/Dissonance/Integrations/FishNet/Demos/Basic/Basic_Demo.unity
     guid: f9669d47f45a32442a68550df2b9c365
   - enabled: 1
-    path: Assets/Dissonance/Integrations/FishNet/Demos/Basic/FishNet Dissonance GameWorld.unity
+    path: Assets/Dissonance/Integrations/FishNet/Demos/Basic/Basic_Demo_GameWorld.unity
     guid: cac31d74840d56b41b07639f1b97e1bd
+  - enabled: 1
+    path: Assets/Dissonance/Integrations/FishNet/Demos/Players/Players_Demo.unity
+    guid: e7cc8815275baca49b4c00f46fbe0dec
+  - enabled: 1
+    path: Assets/Dissonance/Integrations/FishNet/Demos/Players/Players_Demo_GameWorld.unity
+    guid: 5fa9b4243d793e34896b9c129e240267
   m_configObjects: {}

@@ -5,10 +5,11 @@ using FishNet.Transporting;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Dissonance.Integrations.FishNet.Demos.Basic
+namespace Dissonance.Integrations.FishNet.Demos.Utils
 {
-    public class MenuController : MonoBehaviour
+    public class DebugMenuController : MonoBehaviour
     {
+        public string gameWorldSceneName;
         public Text errorMessage;
         public GameObject[] hideOnClick;
         
@@ -56,7 +57,7 @@ namespace Dissonance.Integrations.FishNet.Demos.Basic
         public void OnClickStartServer()
         {
             _networkManager.ServerManager.StartConnection();
-            _networkManager.ClientManager.StartConnection();
+            // _networkManager.ClientManager.StartConnection(); RIGHT NOW EXAMPLES WILL BE SERVER/CLIENT ONLY
             HideAll();
         }
 
@@ -67,11 +68,13 @@ namespace Dissonance.Integrations.FishNet.Demos.Basic
 
         private void ServerManager_OnServerConnectionState(ServerConnectionStateArgs obj)
         {
-            //var scene = SceneManager.GetScene("FishNet Dissonance GameWorld");
-            //if (!scene.IsValid())
-            //    ShowError("Cannot load scene 'FishNet Dissonance GameWorld' - ensure it is added to the build settings");
+            if (obj.ConnectionState != LocalConnectionState.Started) return;
 
-            var sld = new SceneLoadData("Basic_Demo_GameWorld");
+            var scene = SceneManager.GetScene(gameWorldSceneName);
+            if (!scene.IsValid())
+                ShowError($@"Cannot load scene '{gameWorldSceneName}' - ensure it is added to the build settings");
+            
+            var sld = new SceneLoadData(gameWorldSceneName);
             sld.ReplaceScenes = ReplaceOption.All;
 
             _networkManager.SceneManager.LoadGlobalScenes(sld);

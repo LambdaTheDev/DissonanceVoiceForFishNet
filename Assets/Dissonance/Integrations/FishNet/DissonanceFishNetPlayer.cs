@@ -14,6 +14,9 @@ namespace Dissonance.Integrations.FishNet
 
         // Captured DissonanceComms instance
         private DissonanceComms _comms;
+        
+        // Backing field for IsTracking prop
+        private bool _isTracking;
 
         public string PlayerId => _syncedPlayerId;
 
@@ -41,15 +44,13 @@ namespace Dissonance.Integrations.FishNet
                 return;
             }
 
+            // First config player ID
             _comms = fishNetComms.Comms;
+            ServerRpcSetPlayerId(_comms.LocalPlayerName);
+            _comms.LocalPlayerNameChanged += ServerRpcSetPlayerId;
+            
             _comms.TrackPlayerPosition(this);
-        }
-
-        // Sets Player ID to owner ID
-        public override void OnStartServer()
-        {
-            base.OnStartServer();
-            _syncedPlayerId = OwnerId.ToString();
+            IsTracking = true;
         }
 
         // Invoked when Player ID changes (or is set by server)
@@ -66,6 +67,12 @@ namespace Dissonance.Integrations.FishNet
             
             _comms.TrackPlayerPosition(this);
             IsTracking = true;
+        }
+
+        [ServerRpc]
+        private void ServerRpcSetPlayerId(string playerId)
+        {
+            _syncedPlayerId = playerId;
         }
     }
 }

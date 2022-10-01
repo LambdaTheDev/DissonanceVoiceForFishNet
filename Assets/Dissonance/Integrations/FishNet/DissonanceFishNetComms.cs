@@ -5,7 +5,6 @@ using FishNet;
 using FishNet.Connection;
 using FishNet.Managing;
 using FishNet.Transporting;
-using UnityEngine;
 
 namespace Dissonance.Integrations.FishNet
 {
