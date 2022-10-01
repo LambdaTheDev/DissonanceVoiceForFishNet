@@ -5,7 +5,7 @@ using FishNet.Transporting;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Dissonance.Integrations.FishNet.Demo
+namespace Dissonance.Integrations.FishNet.Demos.Basic
 {
     public class MenuController : MonoBehaviour
     {
@@ -71,7 +71,7 @@ namespace Dissonance.Integrations.FishNet.Demo
             //if (!scene.IsValid())
             //    ShowError("Cannot load scene 'FishNet Dissonance GameWorld' - ensure it is added to the build settings");
 
-            var sld = new SceneLoadData("FishNet Dissonance GameWorld");
+            var sld = new SceneLoadData("Basic_Demo_GameWorld");
             sld.ReplaceScenes = ReplaceOption.All;
 
             _networkManager.SceneManager.LoadGlobalScenes(sld);
