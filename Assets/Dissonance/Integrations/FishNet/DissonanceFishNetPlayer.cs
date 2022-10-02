@@ -1,4 +1,5 @@
-using Dissonance.Integrations.FishNet.Utils;
+using System.Runtime.CompilerServices;
+using Dissonance.Integrations.FishNet.Exceptions;
 using FishNet.Connection;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
@@ -14,19 +15,30 @@ namespace Dissonance.Integrations.FishNet
 
         // Captured DissonanceComms instance
         private DissonanceComms _comms;
-        
-        // Backing field for IsTracking prop
-        private bool _isTracking;
 
-        public string PlayerId => _syncedPlayerId;
+        public string PlayerId
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => _syncedPlayerId;
+        }
 
-        // IMPORTANT NOTE: When Punfish finishes child NetworkObjects, I will have 2 options:
-        // A) Make this transform.root.position - less performance
-        // B) Make a check if it's a root object & not allow new FishNet's functionality
-        //
-        // But we will see in future, now this should work.
-        public Vector3 Position => transform.position;
-        public Quaternion Rotation => transform.rotation;
+        public Vector3 Position
+        {
+            // IMPORTANT NOTE: When Punfish finishes child NetworkObjects, I will have 2 options:
+            // A) Make this transform.root.position - less performance
+            // B) Make a check if it's a root object & not allow new FishNet's functionality
+            //
+            // But we will see in future, now this should work.
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => transform.position;
+        }
+
+        public Quaternion Rotation
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => transform.rotation;
+        }
+
         public NetworkPlayerType Type => IsOwner ? NetworkPlayerType.Local : NetworkPlayerType.Remote;
 
         public bool IsTracking { get; private set; }
@@ -38,19 +50,21 @@ namespace Dissonance.Integrations.FishNet
             base.OnOwnershipClient(prevOwner);
             
             DissonanceFishNetComms fishNetComms = DissonanceFishNetComms.Instance;
-            if (fishNetComms == null)
-            {
-                LoggingHelper.Logger.Error("Could not find any DissonanceFishNetComms instance! This DissonancePlayer instance will not work!");
-                return;
-            }
-
-            // First config player ID
-            _comms = fishNetComms.Comms;
-            ServerRpcSetPlayerId(_comms.LocalPlayerName);
-            _comms.LocalPlayerNameChanged += ServerRpcSetPlayerId;
+            if(fishNetComms == null)
+                throw new DissonanceFishNetException("Could not find DissonanceFishNetComms GameObject!");
             
+            if(fishNetComms.Comms == null)
+                throw new DissonanceFishNetException("Could not find DissonanceComms GameObject!");
+
+            _comms = fishNetComms.Comms;
             _comms.TrackPlayerPosition(this);
-            IsTracking = true;
+        }
+
+        // Sets Player ID to owner ID
+        public override void OnStartServer()
+        {
+            base.OnStartServer();
+            _syncedPlayerId = OwnerId.ToString();
         }
 
         // Invoked when Player ID changes (or is set by server)
@@ -67,12 +81,6 @@ namespace Dissonance.Integrations.FishNet
             
             _comms.TrackPlayerPosition(this);
             IsTracking = true;
-        }
-
-        [ServerRpc]
-        private void ServerRpcSetPlayerId(string playerId)
-        {
-            _syncedPlayerId = playerId;
         }
     }
 }

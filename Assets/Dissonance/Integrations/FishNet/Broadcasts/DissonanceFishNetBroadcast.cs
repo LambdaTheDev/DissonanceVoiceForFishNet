@@ -1,9 +1,11 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using Dissonance.Integrations.FishNet.Constants;
 using FishNet.Broadcast;
 using FishNet.Serializing;
 using FishNet.Utility.Performance;
+using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
 
 namespace Dissonance.Integrations.FishNet.Broadcasts

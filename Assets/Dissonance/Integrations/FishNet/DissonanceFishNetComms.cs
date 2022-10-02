@@ -1,10 +1,9 @@
 using Dissonance.Integrations.FishNet.Broadcasts;
-using Dissonance.Integrations.FishNet.Utils;
+using Dissonance.Integrations.FishNet.Constants;
 using Dissonance.Networking;
 using FishNet;
 using FishNet.Connection;
-using FishNet.Managing;
-using FishNet.Transporting;
+using UnityEngine;
 
 namespace Dissonance.Integrations.FishNet
 {
@@ -14,141 +13,101 @@ namespace Dissonance.Integrations.FishNet
 		public static DissonanceFishNetComms Instance { get; private set; }
 
 		public DissonanceComms Comms { get; private set; }
-        internal NetworkManager NetworkManager { get; private set; }
-        
-        private bool _subscribed;
 
 
 		private void Awake()
 		{
-            // Check if there is no double comms instance
-            if (Instance != null)
-            {
-                LoggingHelper.Logger.Error("Only one DissonanceFishNetComms instance is allowed to exist at the time! This one will not work.");
-                return;
-            }
+			if (Instance != null)
+				Debug.LogError("Dissonance Voice Chat for FishNet supports only one DissonanceComms object instance at time! " +
+							   "If this is a big problem for you, contact me on Discord: " + DissonanceFishNetConstants.SupportDiscordServer);
 
-            // Initialize this comms instance & log
+			Instance = this;
 			Comms = GetComponent<DissonanceComms>();
-            NetworkManager = InstanceFinder.NetworkManager;
-            
-            if(Comms == null)
-                LoggingHelper.Logger.Error("Could not find DissonanceComms component on this GameObject! This Comms object will not work.");
-            else
-            {
-                Instance = this;
-                LoggingHelper.Logger.Info("FishNet comms initialized successfully!");
-            }
-        }
+		}
 
-        private void OnEnable()
-        {
-            ManageNetworkEvents(true);
-        }
-
-        protected override void OnDisable()
-        {
-            ManageNetworkEvents(false);
-        }
-
-        protected override void Initialize()
+		protected override void Update()
 		{
-            // Register no broadcast handler so errors can be captured easier
-            NetworkManager.ServerManager.RegisterBroadcast<DissonanceFishNetBroadcast>(NullBroadcastReceivedHandler);
-			NetworkManager.ClientManager.RegisterBroadcast<DissonanceFishNetBroadcast>(NullBroadcastReceivedHandler);
+			UpdateNetwork();
 
-            // If FishNet is offline, there is an error
-            if (NetworkManager.IsOffline)
-            {
-                LoggingHelper.Logger.Error("FishNet must be initialized before initializing Dissonance Voice chat!");
-                return;
-            }
-            
-            // Now, start Dissonance Voice, depending on current FishNet state
-            if (NetworkManager.IsServer)
-            {
-                // Run host or dedicated server
-                if (NetworkManager.IsHost)
-                    RunAsHost(Unit.None, Unit.None);
-                
-                else
-                    RunAsDedicatedServer(Unit.None);
+			base.Update();
+		}
 
-                // Log
-                LoggingHelper.RunningAs(NetworkManager.IsHost ? NetworkMode.Host : NetworkMode.DedicatedServer);
-            }
-            else
-            {
-                RunAsClient(Unit.None);
-                LoggingHelper.RunningAs(NetworkMode.Client);
-            }
-        }
+		protected override void Initialize()
+		{
+			var networkManager = InstanceFinder.NetworkManager;
+			networkManager.ServerManager.RegisterBroadcast<DissonanceFishNetBroadcast>(NullBroadcastReceivedHandler);
+			networkManager.ClientManager.RegisterBroadcast<DissonanceFishNetBroadcast>(NullBroadcastReceivedHandler);
+
+			base.Initialize();
+		}
 
 		protected override DissonanceFishNetServer CreateServer(Unit connectionParameters)
 		{
-            LoggingHelper.Logger.Trace("Creating FishNet server...");
-			return new DissonanceFishNetServer(this);
+			return new DissonanceFishNetServer();
 		}
 
 		protected override DissonanceFishNetClient CreateClient(Unit connectionParameters)
 		{
-            LoggingHelper.Logger.Trace("Creating FishNet client...");
 			return new DissonanceFishNetClient(this);
 		}
 
-        // Helper method that subscribes or unsubscribed 
-        private void ManageNetworkEvents(bool subscribe)
-        {
-            if (subscribe && !_subscribed)
-            {
-                NetworkManager.ServerManager.OnServerConnectionState += ServerManagerOnOnServerConnectionState;
-                NetworkManager.ClientManager.OnClientConnectionState += ClientManagerOnOnClientConnectionState;
+		// I'd like to get rid of this & rely on FishNet callbacks, but first I will make it work, then I'm gonna upgrade it
+		private void UpdateNetwork()
+		{
+			// Check if Dissonance is ready
+			if (IsInitialized)
+			{
+				var networkManager = InstanceFinder.NetworkManager;
+				// Check if the Network is ready
+				var networkActive = networkManager != null && !networkManager.IsOffline;
+				if (networkActive)
+				{
+					// Check what mode the Network is in
+					var server = networkManager.IsServer;
+					var client = networkManager.IsClient;
 
-                _subscribed = true;
-            }
-            else if(!subscribe && _subscribed)
-            {
-                NetworkManager.ServerManager.OnServerConnectionState -= ServerManagerOnOnServerConnectionState;
-                NetworkManager.ClientManager.OnClientConnectionState -= ClientManagerOnOnClientConnectionState;
+					// Check what mode Dissonance is in and if
+					// they're different then call the correct method
+					if (Mode.IsServerEnabled() != server
+						|| Mode.IsClientEnabled() != client)
+					{
+						// Network is server and client, so run as a non-dedicated
+						// host (passing in the correct parameters)
+						if (server && client)
+							RunAsHost(Unit.None, Unit.None);
 
-                _subscribed = false;
-            }
-        }
+						// Network is just a server, so run as a dedicated host
+						else if (server)
+							RunAsDedicatedServer(Unit.None);
 
-        #region Dissonance network peer status callbacks
+						// Network is just a client, so run as a client
+						else if (client)
+							RunAsClient(Unit.None);
+					}
+				}
+				else if (Mode != NetworkMode.None)
+				{
+					Debug.LogWarning("Dissonance disconnected");
+					//Network is not active, make sure Dissonance is not active
+					Stop();
+				}
+			}
+		}
 
-        private void ClientManagerOnOnClientConnectionState(ClientConnectionStateArgs obj)
-        {
-            if (obj.ConnectionState == LocalConnectionState.Stopped)
-            {
-                Stop();
-                LoggingHelper.StoppingAs(NetworkMode.Client);
-            }
-        }
+		internal static void NullBroadcastReceivedHandler(NetworkConnection source, DissonanceFishNetBroadcast broadcast)
+		{
+			if (Logs.GetLogLevel(LogCategory.Network) <= LogLevel.Trace)
+				Debug.Log("Dissonance server not initialized - Discarding Dissonance client broadcast");
 
-        private void ServerManagerOnOnServerConnectionState(ServerConnectionStateArgs obj)
-        {
-            if (obj.ConnectionState == LocalConnectionState.Stopped)
-            {
-                // Stop dissonance & log
-                Stop();
-                LoggingHelper.StoppingAs(NetworkManager.IsHost ? NetworkMode.Host : NetworkMode.DedicatedServer);
-            }
-        }
+			broadcast.ReleaseBuffer();
+		}
 
-        #endregion
+		internal static void NullBroadcastReceivedHandler(DissonanceFishNetBroadcast broadcast)
+		{
+			if (Logs.GetLogLevel(LogCategory.Network) <= LogLevel.Trace)
+				Debug.Log("Dissonance client not initialized - Discarding Dissonance server broadcast");
 
-        #region Debugging
-
-        internal static void NullBroadcastReceivedHandler(NetworkConnection source, DissonanceFishNetBroadcast broadcast) => NullBroadcastLogger(broadcast);
-        internal static void NullBroadcastReceivedHandler(DissonanceFishNetBroadcast broadcast) => NullBroadcastLogger(broadcast);
-
-        private static void NullBroadcastLogger(DissonanceFishNetBroadcast broadcast)
-        {
-            LoggingHelper.Logger.Debug("Dissonance comms instance has not been initialized! Disregarding incoming packet.");
-            broadcast.ReleaseBuffer();
-        }
-
-        #endregion
-    }
+			broadcast.ReleaseBuffer();
+		}
+	}
 }

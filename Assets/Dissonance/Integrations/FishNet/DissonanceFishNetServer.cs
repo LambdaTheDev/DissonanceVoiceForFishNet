@@ -1,8 +1,8 @@
 using System;
 using System.Runtime.CompilerServices;
 using Dissonance.Integrations.FishNet.Broadcasts;
-using Dissonance.Integrations.FishNet.Utils;
 using Dissonance.Networking;
+using FishNet;
 using FishNet.Connection;
 using FishNet.Transporting;
 
@@ -10,31 +10,21 @@ namespace Dissonance.Integrations.FishNet
 {
 	// A Server integration for Dissonance Voice
 	public sealed class DissonanceFishNetServer : BaseServer<DissonanceFishNetServer, DissonanceFishNetClient, DissonanceFishNetConnection>
-    {
-        private readonly DissonanceFishNetComms _fishNetComms;
-
-
-        public DissonanceFishNetServer(DissonanceFishNetComms network)
-        {
-            _fishNetComms = network;
-        }
-        
+	{
 		// Registers Dissonance data broadcast & subscribes to NetworkManager events
 		public override void Connect()
 		{
-			var serverManager = _fishNetComms.NetworkManager.ServerManager;
+			var serverManager = InstanceFinder.ServerManager;
 			serverManager.UnregisterBroadcast<DissonanceFishNetBroadcast>(DissonanceFishNetComms.NullBroadcastReceivedHandler);
 			serverManager.RegisterBroadcast<DissonanceFishNetBroadcast>(OnDissonanceDataReceived);
 			serverManager.OnRemoteConnectionState += FishNetServerOnOnRemoteConnectionState;
 			base.Connect();
-            
-            LoggingHelper.Logger.Debug("Server is ready!");
 		}
 
 		// Unregister Dissonance data broadcast & unsubscribes from NetworkManager events
 		public override void Disconnect()
 		{
-			var serverManager = _fishNetComms.NetworkManager.ServerManager;
+			var serverManager = InstanceFinder.ServerManager;
 			if (serverManager != null)
 			{
 				serverManager.UnregisterBroadcast<DissonanceFishNetBroadcast>(OnDissonanceDataReceived);
@@ -42,8 +32,6 @@ namespace Dissonance.Integrations.FishNet
 				serverManager.OnRemoteConnectionState -= FishNetServerOnOnRemoteConnectionState;
 			}
 			base.Disconnect();
-            
-            LoggingHelper.Logger.Debug("Server stopped!");
 		}
 		
 		// Sends data in a reliable way. Aggressive inlined due to it's just a wrapper
@@ -79,11 +67,13 @@ namespace Dissonance.Integrations.FishNet
 		// Called when FishNet client connects or disconnects
 		private void FishNetServerOnOnRemoteConnectionState(NetworkConnection fishNetConnection, RemoteConnectionStateArgs newState)
 		{
+			  
 			// Client disconnected
 			if (newState.ConnectionState != RemoteConnectionState.Stopped) return;
 			DissonanceFishNetConnection dissonanceConnection = new DissonanceFishNetConnection(fishNetConnection);
 			ClientDisconnected(dissonanceConnection);
-            LoggingHelper.Logger.Info("Remote client with ID: {0} has disconnected!", fishNetConnection.ClientId);
-        }
+
+			
+		}
 	}
 }
