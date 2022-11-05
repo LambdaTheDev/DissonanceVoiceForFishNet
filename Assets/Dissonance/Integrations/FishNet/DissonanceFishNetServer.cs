@@ -51,8 +51,9 @@ namespace Dissonance.Integrations.FishNet
 		protected override void SendReliable(DissonanceFishNetConnection connection, ArraySegment<byte> packet)
 		{
 			if (!connection.FishNetConnection.IsActive) return;
-			DissonanceFishNetBroadcast broadcast = new DissonanceFishNetBroadcast(packet);
+            DissonanceFishNetBroadcast broadcast = BroadcastHelper.CreateFromOriginalData(packet);
 			connection.FishNetConnection.Broadcast(broadcast);
+            broadcast.ReleaseBuffer();
 		}
 
 		// Sends data in an unreliable way. Aggressive inlined due to it's just a wrapper
@@ -60,9 +61,10 @@ namespace Dissonance.Integrations.FishNet
 		protected override void SendUnreliable(DissonanceFishNetConnection connection, ArraySegment<byte> packet)
 		{
 			if (!connection.FishNetConnection.IsActive) return;
-			DissonanceFishNetBroadcast broadcast = new DissonanceFishNetBroadcast(packet);
+            DissonanceFishNetBroadcast broadcast = BroadcastHelper.CreateFromOriginalData(packet);
 			connection.FishNetConnection.Broadcast(broadcast, true, Channel.Unreliable);
-		}
+            broadcast.ReleaseBuffer();
+        }
 
         // Not needed in FishNet
 		protected override void ReadMessages() { }

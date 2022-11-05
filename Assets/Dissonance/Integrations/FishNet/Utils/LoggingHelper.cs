@@ -8,30 +8,23 @@ namespace Dissonance.Integrations.FishNet.Utils
         public static readonly Log Logger = Logs.Create(LogCategory.Network, "FishNet");
 
         private const string RunningAsTemplate = "Running as: {0}!";
-        private static readonly string RunningAsClient = string.Format(RunningAsTemplate, "CLIENT");
-        private static readonly string RunningAsServer = string.Format(RunningAsTemplate, "SERVER");
-        private static readonly string RunningAsHost = string.Format(RunningAsTemplate, "HOST");
-
         private const string StoppingAsTemplate = "Stopping as: {0}!";
-        private static readonly string StoppingAsClient = string.Format(StoppingAsTemplate, "CLIENT");
-        private static readonly string StoppingAsServer = string.Format(StoppingAsTemplate, "SERVER");
-        private static readonly string StoppingAsHost = string.Format(StoppingAsTemplate, "HOST");
-        
+
 
         public static void RunningAs(NetworkMode mode)
         {
             switch (mode)
             {
                 case NetworkMode.Client:
-                    Logger.Info(RunningAsClient);
+                    Logger.Info(string.Format(RunningAsTemplate, "CLIENT"));
                     break;
 
                 case NetworkMode.DedicatedServer:
-                    Logger.Info(RunningAsServer);
+                    Logger.Info(string.Format(RunningAsTemplate, "SERVER"));
                     break;
 
                 case NetworkMode.Host:
-                    Logger.Info(RunningAsHost);
+                    Logger.Info(string.Format(RunningAsTemplate, "HOST"));
                     break;
             }
         }
@@ -41,15 +34,15 @@ namespace Dissonance.Integrations.FishNet.Utils
             switch (mode)
             {
                 case NetworkMode.Client:
-                    Logger.Info(StoppingAsClient);
+                    Logger.Info(string.Format(StoppingAsTemplate, "CLIENT"));
                     break;
 
                 case NetworkMode.DedicatedServer:
-                    Logger.Info(StoppingAsServer);
+                    Logger.Info(string.Format(StoppingAsTemplate, "SERVER"));
                     break;
 
                 case NetworkMode.Host:
-                    Logger.Info(StoppingAsHost);
+                    Logger.Info(string.Format(StoppingAsTemplate, "HOST"));
                     break;
             }        
         }

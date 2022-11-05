@@ -9,28 +9,27 @@ namespace Dissonance.Integrations.FishNet
     // A Player object wrapper for Dissonance Voice
     public sealed class DissonanceFishNetPlayer : NetworkBehaviour, IDissonancePlayer
     {
+        [Tooltip("This transform will be used in positional voice processing. If unset, then GameObject's transform will be used.")]
+        [SerializeField] private Transform trackingTransform;
+        
         // SyncVar ensures that all observers know player ID, even late joiners
         [SyncVar(OnChange = nameof(OnPlayerIdHookFired))] private string _syncedPlayerId;
 
         // Captured DissonanceComms instance
         private DissonanceComms _comms;
-        
-        // Backing field for IsTracking prop
-        private bool _isTracking;
 
         public string PlayerId => _syncedPlayerId;
-
-        // IMPORTANT NOTE: When Punfish finishes child NetworkObjects, I will have 2 options:
-        // A) Make this transform.root.position - less performance
-        // B) Make a check if it's a root object & not allow new FishNet's functionality
-        //
-        // But we will see in future, now this should work.
-        public Vector3 Position => transform.position;
-        public Quaternion Rotation => transform.rotation;
+        public Vector3 Position => trackingTransform.position;
+        public Quaternion Rotation => trackingTransform.rotation;
         public NetworkPlayerType Type => IsOwner ? NetworkPlayerType.Local : NetworkPlayerType.Remote;
 
         public bool IsTracking { get; private set; }
 
+
+        private void Start()
+        {
+            if (trackingTransform == null) trackingTransform = transform;
+        }
 
         // Called by FishNet when object is spawned on client with authority
         public override void OnOwnershipClient(NetworkConnection prevOwner)
@@ -54,7 +53,7 @@ namespace Dissonance.Integrations.FishNet
         }
 
         // Invoked when Player ID changes (or is set by server)
-        private void OnPlayerIdHookFired(string _, string __, bool asServer)
+        private void OnPlayerIdHookFired(string _, string __, bool ___)
         {
             if (_comms == null)
                 return;

@@ -48,16 +48,16 @@ namespace Dissonance.Integrations.FishNet
 		// Sends data in a reliable way
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		protected override void SendReliable(ArraySegment<byte> packet)
-		{
-			DissonanceFishNetBroadcast broadcast = new DissonanceFishNetBroadcast(packet);
+        {
+            DissonanceFishNetBroadcast broadcast = BroadcastHelper.CreateFromOriginalData(packet);
 			InstanceFinder.ClientManager.Broadcast(broadcast);
 		}
 
 		// Sends data in an unreliable way
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		protected override void SendUnreliable(ArraySegment<byte> packet)
-		{
-			DissonanceFishNetBroadcast broadcast = new DissonanceFishNetBroadcast(packet);
+        {
+            DissonanceFishNetBroadcast broadcast = BroadcastHelper.CreateFromOriginalData(packet);
 			InstanceFinder.ClientManager.Broadcast(broadcast, Channel.Unreliable);
 		}
 

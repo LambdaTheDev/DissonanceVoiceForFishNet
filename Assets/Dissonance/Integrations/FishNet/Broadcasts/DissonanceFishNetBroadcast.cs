@@ -1,6 +1,7 @@
 using System;
 using System.Runtime.CompilerServices;
 using Dissonance.Integrations.FishNet.Constants;
+using Dissonance.Integrations.FishNet.Utils;
 using FishNet.Broadcast;
 using FishNet.Serializing;
 using FishNet.Utility.Performance;
@@ -12,41 +13,20 @@ namespace Dissonance.Integrations.FishNet.Broadcasts
 	public readonly struct DissonanceFishNetBroadcast : IBroadcast
 	{
 		public readonly ArraySegment<byte> Payload;
+        public readonly bool IsRentedBuffer;
 
 
-		public DissonanceFishNetBroadcast(ArraySegment<byte> originalData)
-		{
-			if (!EnsurePacketSize(originalData.Count))
-			{
-				Payload = default;
-				return;
-			}
-
-			byte[] rentedArray = ByteArrayPool.Retrieve(originalData.Count);
-
-#if DISSONANCE_FOR_FISHNET_UNSAFE
-            unsafe
-            {
-                // Copy original data content to rented byte array
-                fixed(byte* rentedPtr = rentedArray)
-                fixed (byte* originalPtr = &originalData.Array[originalData.Offset])
-                {
-                    UnsafeUtility.MemCpy(rentedPtr, originalPtr, originalData.Count);
-                }
-            }
-            
-            return;
-#endif
-
-			Buffer.BlockCopy(originalData.Array, originalData.Offset, rentedArray, 0, originalData.Count);
-			Payload = new ArraySegment<byte>(rentedArray, 0, originalData.Count);
-		}
+		public DissonanceFishNetBroadcast(ArraySegment<byte> data, bool rentedBuffer)
+        {
+            Payload = data;
+            IsRentedBuffer = rentedBuffer;
+        }
 
 		// Returns buffer content
 		public void ReleaseBuffer()
 		{
 			// If array is not null, then return it to pool
-			if (Payload.Array != null)
+			if (Payload.Array != null && IsRentedBuffer)
 				ByteArrayPool.Store(Payload.Array);
 		}
 
@@ -69,23 +49,16 @@ namespace Dissonance.Integrations.FishNet.Broadcasts
 	{
 		public static void WriteDissonanceFishNetBroadcast(this Writer writer, DissonanceFishNetBroadcast value)
 		{
-			writer.WriteUInt16((ushort)value.Payload.Count);
-			writer.WriteBytes(value.Payload.Array, value.Payload.Offset, value.Payload.Count);
+			writer.WriteArraySegmentAndSize(value.Payload);
 		}
 
 		public static DissonanceFishNetBroadcast ReadDissonanceFishNetBroadcast(this Reader reader)
-		{
-			var length = reader.ReadUInt16();
-			var arr = ByteArrayPool.Retrieve(length);
-
-			for (var i = 0; i < length; i++)
-				arr[i] = reader.ReadByte();
-
-			var broadcast = new DissonanceFishNetBroadcast(new ArraySegment<byte>(arr, 0, length));
-
-			ByteArrayPool.Store(arr);
-
-			return broadcast;
-		}
+        {
+            // todo: When Martin responds, make a final decision.
+            // If packets are handled instantly, then Ill just wrap Reader's memory into broadcast & go
+            // Otherwise, if packets may be processed later & buffer get overriden, I'll make a data copy
+            ArraySegment<byte> readSegment = reader.ReadArraySegmentAndSize();
+            return new DissonanceFishNetBroadcast(readSegment, false);
+        }
 	}
 }
