@@ -290,7 +290,7 @@ MonoBehaviour:
     _tokens: []
   _channelTypeExpanded: 0
   _metadataExpanded: 0
-  _activationModeExpanded: 0
+  _activationModeExpanded: 1
   _tokensExpanded: 0
   _ampExpanded: 0
   _activationFaderSettings:
@@ -303,8 +303,8 @@ MonoBehaviour:
     _fadeOutTicks: 11500000
   _broadcastPosition: 1
   _channelType: 0
-  _inputName: 
-  _mode: 1
+  _inputName: GlobalChat
+  _mode: 2
   _muted: 0
   _playerId: 
   _useTrigger: 0

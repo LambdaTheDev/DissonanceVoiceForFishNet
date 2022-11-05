@@ -1,3 +1,4 @@
+using System.Collections;
 using FishNet;
 using FishNet.Managing;
 using FishNet.Managing.Scened;
@@ -14,6 +15,7 @@ namespace Dissonance.Integrations.FishNet.Demos.Utils
         public GameObject[] hideOnClick;
         
         private NetworkManager _networkManager;
+        private bool _startingAsHost;
 
         
         private void Start()
@@ -61,15 +63,53 @@ namespace Dissonance.Integrations.FishNet.Demos.Utils
             HideAll();
         }
 
+        public void OnClickStartHost()
+        {
+            _startingAsHost = true;
+            _networkManager.ServerManager.StartConnection();
+            _networkManager.ClientManager.StartConnection();
+            
+            HideAll();
+        }
+
         private void ClientManager_OnClientConnectionState(ClientConnectionStateArgs obj)
         {
         }
 
-
         private void ServerManager_OnServerConnectionState(ServerConnectionStateArgs obj)
         {
             if (obj.ConnectionState != LocalConnectionState.Started) return;
+            if (_startingAsHost && !_networkManager.IsHost)
+            {
+                StartCoroutine(DelayedLoadScene());
+                return;
+            }
 
+            LoadGameScene();
+        }
+
+        private IEnumerator DelayedLoadScene()
+        {
+            int attempts = 10;
+            
+            while (attempts > 0 && !_networkManager.IsHost)
+            {
+                attempts--;
+                yield return new WaitForSeconds(1f);
+            }
+
+            if (attempts == 0)
+            {
+                Debug.LogError("Could not start client in host mode!");
+            }
+            else
+            {
+                LoadGameScene();
+            }
+        }
+
+        private void LoadGameScene()
+        {
             var scene = SceneManager.GetScene(gameWorldSceneName);
             if (!scene.IsValid())
                 ShowError($@"Cannot load scene '{gameWorldSceneName}' - ensure it is added to the build settings");
