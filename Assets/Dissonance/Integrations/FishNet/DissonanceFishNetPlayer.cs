@@ -13,12 +13,13 @@ namespace Dissonance.Integrations.FishNet
         [SerializeField] private Transform trackingTransform;
         
         // SyncVar ensures that all observers know player ID, even late joiners
-        [SyncVar(OnChange = nameof(OnPlayerIdHookFired))] private string _syncedPlayerId;
+        [SyncVar(ReadPermissions = ReadPermission.Observers, OnChange = nameof(OnSyncedPlayerNameUpdated))] 
+        private string _syncedPlayerName;
 
         // Captured DissonanceComms instance
         private DissonanceComms _comms;
 
-        public string PlayerId => _syncedPlayerId;
+        public string PlayerId => _syncedPlayerName;
         public Vector3 Position => trackingTransform.position;
         public Quaternion Rotation => trackingTransform.rotation;
         public NetworkPlayerType Type => IsOwner ? NetworkPlayerType.Local : NetworkPlayerType.Remote;
@@ -29,6 +30,12 @@ namespace Dissonance.Integrations.FishNet
         private void Start()
         {
             if (trackingTransform == null) trackingTransform = transform;
+        }
+
+        private void OnDisable()
+        {
+            if(IsTracking)
+                ManageTrackingState(false);
         }
 
         // Called by FishNet when object is spawned on client with authority
@@ -43,35 +50,47 @@ namespace Dissonance.Integrations.FishNet
                 return;
             }
 
-            // First config player ID
-            _comms = fishNetComms.Comms;
-            ServerRpcSetPlayerId(_comms.LocalPlayerName);
-            _comms.LocalPlayerNameChanged += ServerRpcSetPlayerId;
-            
-            _comms.TrackPlayerPosition(this);
-            IsTracking = true;
+            // Configure Player name
+            SetPlayerName(fishNetComms.Comms.LocalPlayerName);
+            fishNetComms.Comms.LocalPlayerNameChanged += SetPlayerName;
         }
 
-        // Invoked when Player ID changes (or is set by server)
-        private void OnPlayerIdHookFired(string _, string __, bool asServer)
+        private void SetPlayerName(string playerName)
         {
-            if (_comms == null || asServer)
-                return;
-
-            if (IsTracking)
-            {
-                _comms.StopTracking(this);
-                IsTracking = false;
-            }
+            // Disable tracking before name change
+            if (IsTracking) ManageTrackingState(false);
             
-            _comms.TrackPlayerPosition(this);
-            IsTracking = true;
+            // Update name & re-enable tracking
+            _syncedPlayerName = playerName;
+            ManageTrackingState(true);
+            
+            // And if owner, sync name over network
+            if(IsOwner) ServerRpcSetPlayerName(playerName);
+        }
+        
+        [ServerRpc(RequireOwnership = true)]
+        private void ServerRpcSetPlayerName(string playerName)
+        {
+            _syncedPlayerName = playerName;
         }
 
-        [ServerRpc]
-        private void ServerRpcSetPlayerId(string playerId)
+        private void OnSyncedPlayerNameUpdated(string _, string updatedName, bool __)
         {
-            _syncedPlayerId = playerId;
+            if(!IsOwner) SetPlayerName(updatedName);
+        }
+
+        private void ManageTrackingState(bool track)
+        {
+            // Check if you should change tracking state
+            if (IsTracking && track) return;
+            if (!IsTracking && !track) return;
+
+            // And update it
+            DissonanceComms comms = DissonanceFishNetComms.Instance.Comms;
+            if(track) comms.TrackPlayerPosition(this);
+            else comms.StopTracking(this);
+
+            IsTracking = track;
         }
     }
 }

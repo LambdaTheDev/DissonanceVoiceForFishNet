@@ -215,8 +215,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 598292140}
-  - component: {fileID: 598292139}
-  - component: {fileID: 598292138}
   - component: {fileID: 598292142}
   - component: {fileID: 598292141}
   m_Layer: 0
@@ -226,40 +224,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &598292138
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 598292137}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 65b0b6734c9d4198ad4fc591f5577abd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &598292139
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 598292137}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8cb4dc319de88dc4cb76c47aafb46b1c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _lastPrefabError: 
-  _isMuted: 0
-  _isDeafened: 0
-  _oneMinusBaseRemoteVoiceVolume: 0
-  _playbackPrefab: {fileID: 0}
-  _playbackPrefab2: {fileID: 0}
-  _micName: 
-  _playerPriority: 0
-  _tokens:
-    _tokens: []
 --- !u!4 &598292140
 Transform:
   m_ObjectHideFlags: 0
@@ -324,6 +288,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _tokens:
     _tokens: []
+  _roomExpanded: 1
+  _tokensExpanded: 0
+  _colliderExpanded: 0
   _roomName: Global
   _useTrigger: 0
 --- !u!1 &1254347547

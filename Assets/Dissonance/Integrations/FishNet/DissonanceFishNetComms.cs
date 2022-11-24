@@ -15,7 +15,8 @@ namespace Dissonance.Integrations.FishNet
 
 		public DissonanceComms Comms { get; private set; }
         internal NetworkManager NetworkManager { get; private set; }
-        
+
+        private NetworkMode _currentNetworkMode = NetworkMode.None;
         private bool _subscribed;
 
 
@@ -29,16 +30,9 @@ namespace Dissonance.Integrations.FishNet
             }
 
             // Initialize this comms instance & log
-			Comms = GetComponent<DissonanceComms>();
             NetworkManager = InstanceFinder.NetworkManager;
-            
-            if(Comms == null)
-                LoggingHelper.Logger.Error("Could not find DissonanceComms component on this GameObject! This Comms object will not work.");
-            else
-            {
-                Instance = this;
-                LoggingHelper.Logger.Info("FishNet comms initialized successfully!");
-            }
+            Instance = this;
+            LoggingHelper.Logger.Info("FishNet comms initialized successfully!");
         }
 
         private void OnEnable()
@@ -51,6 +45,11 @@ namespace Dissonance.Integrations.FishNet
             ManageNetworkEvents(false);
         }
 
+        internal void InitializeDissonanceComms()
+        {
+            Comms = GetComponent<DissonanceComms>();
+        }
+        
         protected override void Initialize()
 		{
             // Register no broadcast handler so errors can be captured easier
@@ -65,23 +64,7 @@ namespace Dissonance.Integrations.FishNet
             }
             
             // Now, start Dissonance Voice, depending on current FishNet state
-            if (NetworkManager.IsServer)
-            {
-                // Run host or dedicated server
-                if (NetworkManager.IsHost)
-                    RunAsHost(Unit.None, Unit.None);
-                
-                else
-                    RunAsDedicatedServer(Unit.None);
-
-                // Log
-                LoggingHelper.RunningAs(NetworkManager.IsHost ? NetworkMode.Host : NetworkMode.DedicatedServer);
-            }
-            else
-            {
-                RunAsClient(Unit.None);
-                LoggingHelper.RunningAs(NetworkMode.Client);
-            }
+            AdjustDissonanceRunningMode();
         }
 
 		protected override DissonanceFishNetServer CreateServer(Unit connectionParameters)
@@ -119,25 +102,84 @@ namespace Dissonance.Integrations.FishNet
 
         private void ClientManagerOnOnClientConnectionState(ClientConnectionStateArgs obj)
         {
-            if (obj.ConnectionState == LocalConnectionState.Stopped)
-            {
-                Stop();
-                LoggingHelper.StoppingAs(NetworkMode.Client);
-            }
+            OnFishNetStateDirty(obj.ConnectionState);
         }
 
         private void ServerManagerOnOnServerConnectionState(ServerConnectionStateArgs obj)
         {
-            if (obj.ConnectionState == LocalConnectionState.Stopped)
-            {
-                // Stop dissonance & log
-                Stop();
-                LoggingHelper.StoppingAs(NetworkManager.IsHost ? NetworkMode.Host : NetworkMode.DedicatedServer);
-            }
+            OnFishNetStateDirty(obj.ConnectionState);
+        }
+
+        private void OnFishNetStateDirty(LocalConnectionState state)
+        {
+            if (state != LocalConnectionState.Started && state != LocalConnectionState.Stopped) return;
+            AdjustDissonanceRunningMode();
         }
 
         #endregion
 
+
+        #region Running Dissonance
+
+        // NOTE: Dissonance can change it's running mode AT RUNTIME!
+        // So when callbacks detect a change, I can just call this method to adjust it
+        private void AdjustDissonanceRunningMode()
+        {
+            // Now, start Dissonance Voice, depending on current FishNet state
+            // This is true for server & host mode
+            if (NetworkManager.ServerManager.Started)
+            {
+                // Run host or dedicated server
+                bool isHostStarted = NetworkManager.ServerManager.Started && NetworkManager.ClientManager.Started;
+                
+                if (isHostStarted)
+                {
+                    if (_currentNetworkMode == NetworkMode.Host) return;
+                    
+                    _currentNetworkMode = NetworkMode.Host;
+                    RunAsHost(Unit.None, Unit.None);
+                }
+
+                // If is server (upper condition) and isn't a host, then it's a server
+                else
+                {
+                    if (_currentNetworkMode == NetworkMode.DedicatedServer) return;
+                    
+                    _currentNetworkMode = NetworkMode.DedicatedServer;
+                    RunAsDedicatedServer(Unit.None);
+                }
+                
+                // Log changes
+                LoggingHelper.RunningAs(_currentNetworkMode);
+            }
+            
+            // If client only & dirty, stop client
+            else if(NetworkManager.ClientManager.Started)
+            {
+                if (_currentNetworkMode == NetworkMode.Client) return;
+
+                _currentNetworkMode = NetworkMode.Client;
+                RunAsClient(Unit.None);
+                LoggingHelper.RunningAs(NetworkMode.Client);
+            }
+
+            // If offline & dirty, stop dissonance
+            else if (NetworkManager.IsOffline)
+            {
+                if (_currentNetworkMode == NetworkMode.None) return;
+                bool isClientOnly = _currentNetworkMode == NetworkMode.Client;
+                
+                _currentNetworkMode = NetworkMode.None;
+                Stop();
+                
+                if (isClientOnly) LoggingHelper.StoppingAs(NetworkMode.Client);
+                else LoggingHelper.StoppingAs(NetworkManager.IsHost ? NetworkMode.Host : NetworkMode.DedicatedServer);
+            }
+        }
+
+        #endregion
+        
+        
         #region Debugging
 
         internal static void NullBroadcastReceivedHandler(NetworkConnection source, DissonanceFishNetBroadcast broadcast) => NullBroadcastLogger(broadcast);

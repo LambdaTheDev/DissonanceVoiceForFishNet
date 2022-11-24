@@ -1,7 +1,7 @@
 namespace Dissonance.Integrations.FishNet.Constants
 {
     // Constant data of Dissonance Voice stuff
-    public static class DissonanceFishNetConstants
+    internal static class DissonanceFishNetConstants
     {
         // Threshold, to ensure that someone does not send... too big packets
         public const int PacketSizeThreshold = 1200;

@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _loggingEnabled: 1
   _developmentLogging: 3
-  _guiLogging: 3
-  _headlessLogging: 3
+  _guiLogging: 0
+  _headlessLogging: 0
