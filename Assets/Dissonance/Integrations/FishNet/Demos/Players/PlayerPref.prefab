@@ -113,21 +113,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   NetworkObserver: {fileID: 0}
-  <PrefabId>k__BackingField: 0
-  _scenePathHash: 2267606651
+  <PrefabId>k__BackingField: -1
+  _scenePathHash: 0
   <SceneId>k__BackingField: 0
-  <AssetPathHash>k__BackingField: 0
-  _sceneNetworkObjects:
-  - {fileID: 6120315999404777701}
+  <AssetPathHash>k__BackingField: 18064514342303738959
+  _sceneNetworkObjects: []
   <IsNested>k__BackingField: 0
   <ComponentIndex>k__BackingField: 0
-  _networkBehaviours:
-  - {fileID: 4615836822831410400}
+  _networkBehaviours: []
   <ParentNetworkObject>k__BackingField: {fileID: 0}
   <ChildNetworkObjects>k__BackingField: []
   _isNetworked: 1
   _isGlobal: 0
-  _disableOnDespawn: 0
+  _defaultDespawnType: 0
 --- !u!114 &4615836822831410400
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -140,9 +138,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2836e36774ca1c4bbbee976e17b649c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 0
+  _componentIndexCache: 255
   _addedNetworkObject: {fileID: 6120315999404777701}
-  _networkObjectCache: {fileID: 6120315999404777701}
+  _networkObjectCache: {fileID: 0}
   _synchronizeParent: 0
   _packing:
     Position: 1
@@ -182,6 +180,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7bdcc4ece38448a4a9d83d609efd97de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _componentIndexCache: 255
+  _addedNetworkObject: {fileID: 6120315999404777701}
+  _networkObjectCache: {fileID: 0}
   speed: 10
 --- !u!114 &-4385413815503874854
 MonoBehaviour:
@@ -198,3 +199,4 @@ MonoBehaviour:
   _componentIndexCache: 255
   _addedNetworkObject: {fileID: 6120315999404777701}
   _networkObjectCache: {fileID: 0}
+  trackingTransform: {fileID: 0}
