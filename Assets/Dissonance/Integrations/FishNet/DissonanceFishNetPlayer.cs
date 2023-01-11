@@ -1,3 +1,4 @@
+using System;
 using Dissonance.Integrations.FishNet.Utils;
 using FishNet.Connection;
 using FishNet.Object;
@@ -32,6 +33,12 @@ namespace Dissonance.Integrations.FishNet
             if (trackingTransform == null) trackingTransform = transform;
         }
 
+        private void OnEnable()
+        {
+            if(!IsTracking)
+                ManageTrackingState(true);
+        }
+        
         private void OnDisable()
         {
             if(IsTracking)
