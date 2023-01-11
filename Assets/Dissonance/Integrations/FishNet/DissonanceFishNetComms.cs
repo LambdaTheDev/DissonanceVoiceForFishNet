@@ -5,6 +5,7 @@ using FishNet;
 using FishNet.Connection;
 using FishNet.Managing;
 using FishNet.Transporting;
+using UnityEngine;
 
 namespace Dissonance.Integrations.FishNet
 {
@@ -13,6 +14,9 @@ namespace Dissonance.Integrations.FishNet
 	{
 		public static DissonanceFishNetComms Instance { get; private set; }
 
+        [Tooltip("Mark this field as true, if FishNetworking instance is started BEFORE DissonanceComms and if you want to run it automatically.")]
+        public bool autoInitialize;
+        
 		public DissonanceComms Comms { get; private set; }
         internal NetworkManager NetworkManager { get; private set; }
 
@@ -57,14 +61,14 @@ namespace Dissonance.Integrations.FishNet
 			NetworkManager.ClientManager.RegisterBroadcast<DissonanceFishNetBroadcast>(NullBroadcastReceivedHandler);
 
             // If FishNet is offline, there is an error
-            if (NetworkManager.IsOffline)
+            if (NetworkManager.IsOffline && autoInitialize)
             {
-                LoggingHelper.Logger.Error("FishNet must be initialized before initializing Dissonance Voice chat!");
+                LoggingHelper.Logger.Error("{0} field is enabled and FishNetworking is offline! Potential solution: Ensure that FishNetworking starts first, or set {0} field to false!", nameof(autoInitialize));
                 return;
             }
             
             // Now, start Dissonance Voice, depending on current FishNet state
-            AdjustDissonanceRunningMode();
+            if(autoInitialize) AdjustDissonanceRunningMode();
         }
 
 		protected override DissonanceFishNetServer CreateServer(Unit connectionParameters)

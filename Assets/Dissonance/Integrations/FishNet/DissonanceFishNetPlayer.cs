@@ -27,7 +27,7 @@ namespace Dissonance.Integrations.FishNet
         public bool IsTracking { get; private set; }
 
 
-        private void Start()
+        private void Awake()
         {
             if (trackingTransform == null) trackingTransform = transform;
         }
@@ -42,6 +42,8 @@ namespace Dissonance.Integrations.FishNet
         public override void OnOwnershipClient(NetworkConnection prevOwner)
         {
             base.OnOwnershipClient(prevOwner);
+
+            if (!IsOwner) return;
             
             DissonanceFishNetComms fishNetComms = DissonanceFishNetComms.Instance;
             if (fishNetComms == null)
