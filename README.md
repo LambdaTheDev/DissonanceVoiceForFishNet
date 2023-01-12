@@ -11,7 +11,6 @@ To get started, follow those steps:
 # Feature list:
 - High-performance Dissonance Voice Chat integration
 - Using FishNet's built-in byte buffer pool
-- Possibility to use unsafe code, to improve performance (add DISSONANCE_FOR_FISHNET_UNSAFE scripting define in Project Settings -> Player -> Scripting Define Symbols)
 
 # Support
 If you have any problems related to FISH NET INTEGRATION, feel free to ask me on my Discord (recently created): https://discord.gg/z9CakMWnT6
