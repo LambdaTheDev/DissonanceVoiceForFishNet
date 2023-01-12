@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Dissonance.Integrations.FishNet.Broadcasts;
 using Dissonance.Integrations.FishNet.Utils;
 using Dissonance.Networking;
@@ -181,6 +182,7 @@ namespace Dissonance.Integrations.FishNet
         internal static void NullBroadcastReceivedHandler(NetworkConnection source, DissonanceFishNetBroadcast broadcast) => NullBroadcastLogger(broadcast);
         internal static void NullBroadcastReceivedHandler(DissonanceFishNetBroadcast broadcast) => NullBroadcastLogger(broadcast);
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void NullBroadcastLogger(DissonanceFishNetBroadcast broadcast)
         {
             LoggingHelper.Logger.Debug("Dissonance comms instance has not been initialized! Disregarding incoming packet.");

@@ -13,38 +13,12 @@ namespace Dissonance.Integrations.FishNet.Utils
 
         public static void RunningAs(NetworkMode mode)
         {
-            switch (mode)
-            {
-                case NetworkMode.Client:
-                    Logger.Info(string.Format(RunningAsTemplate, "CLIENT"));
-                    break;
-
-                case NetworkMode.DedicatedServer:
-                    Logger.Info(string.Format(RunningAsTemplate, "SERVER"));
-                    break;
-
-                case NetworkMode.Host:
-                    Logger.Info(string.Format(RunningAsTemplate, "HOST"));
-                    break;
-            }
+            Logger.Info(string.Format(RunningAsTemplate, mode.ToString()));
         }
 
         public static void StoppingAs(NetworkMode mode)
         {
-            switch (mode)
-            {
-                case NetworkMode.Client:
-                    Logger.Info(string.Format(StoppingAsTemplate, "CLIENT"));
-                    break;
-
-                case NetworkMode.DedicatedServer:
-                    Logger.Info(string.Format(StoppingAsTemplate, "SERVER"));
-                    break;
-
-                case NetworkMode.Host:
-                    Logger.Info(string.Format(StoppingAsTemplate, "HOST"));
-                    break;
-            }        
+            Logger.Info(string.Format(StoppingAsTemplate, mode.ToString()));
         }
     }
 }
