@@ -1,7 +1,6 @@
 using System;
 using System.Runtime.CompilerServices;
 using Dissonance.Integrations.FishNet.Constants;
-using Dissonance.Integrations.FishNet.Utils;
 using FishNet.Broadcast;
 using FishNet.Serializing;
 using FishNet.Utility.Performance;
