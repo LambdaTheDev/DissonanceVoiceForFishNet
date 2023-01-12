@@ -1,4 +1,3 @@
-using System;
 using Dissonance.Integrations.FishNet.Utils;
 using FishNet.Connection;
 using FishNet.Object;
@@ -35,14 +34,12 @@ namespace Dissonance.Integrations.FishNet
 
         private void OnEnable()
         {
-            if(!IsTracking)
-                ManageTrackingState(true);
+            ManageTrackingState(true);
         }
         
         private void OnDisable()
-        {
-            if(IsTracking)
-                ManageTrackingState(false);
+        { 
+            ManageTrackingState(false);
         }
 
         // Called by FishNet when object is spawned on client with authority
@@ -91,12 +88,13 @@ namespace Dissonance.Integrations.FishNet
         private void ManageTrackingState(bool track)
         {
             // Check if you should change tracking state
-            if (IsTracking && track) return;
-            if (!IsTracking && !track) return;
+            if (IsTracking == track) return;
+            if (DissonanceFishNetComms.Instance == null) return;
+            if (track && !DissonanceFishNetComms.Instance.IsInitialized) return;
 
             // And update it
             DissonanceComms comms = DissonanceFishNetComms.Instance.Comms;
-            if(track) comms.TrackPlayerPosition(this);
+            if (track) comms.TrackPlayerPosition(this);
             else comms.StopTracking(this);
 
             IsTracking = track;

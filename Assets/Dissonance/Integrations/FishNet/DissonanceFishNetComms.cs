@@ -33,6 +33,7 @@ namespace Dissonance.Integrations.FishNet
             // Initialize this comms instance & log
             NetworkManager = InstanceFinder.NetworkManager;
             Instance = this;
+            ManageNetworkEvents(true);
             LoggingHelper.Logger.Info("FishNet comms initialized successfully!");
         }
 
@@ -58,7 +59,9 @@ namespace Dissonance.Integrations.FishNet
 			NetworkManager.ClientManager.RegisterBroadcast<DissonanceFishNetBroadcast>(NullBroadcastReceivedHandler);
             
             // Now, start Dissonance Voice, depending on current FishNet state
-            if(!NetworkManager.IsOffline) AdjustDissonanceRunningMode();
+            // If not offline (FN is running), then it's gonna adjust to current FishNet's mode
+            // Otherwise, in Awake() Network event will detect when FishNet will go online & adjust running mode
+            AdjustDissonanceRunningMode();
         }
 
 		protected override DissonanceFishNetServer CreateServer(Unit connectionParameters)
