@@ -131,3 +131,5 @@ Assets/Scenes/SampleScene.unity.meta
 /[Aa]ssets/Plugins.meta
 /[Aa]ssets/ParrelSync/**
 /[Aa]ssets/ParrelSync.meta
+Assets/DefaultPrefabObjects.asset
+Assets/DefaultPrefabObjects.asset.meta
