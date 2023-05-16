@@ -47,7 +47,7 @@ namespace Dissonance.Integrations.FishNet
         {
             base.OnOwnershipClient(prevOwner);
 
-            if (!IsOwner) return;
+            if (prevOwner == null || !IsOwner) return;
             
             DissonanceFishNetComms fishNetComms = DissonanceFishNetComms.Instance;
             if (fishNetComms == null)
