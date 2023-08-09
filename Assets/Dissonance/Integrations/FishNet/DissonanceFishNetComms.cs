@@ -32,6 +32,7 @@ namespace Dissonance.Integrations.FishNet
 
             // Initialize this comms instance & log
             NetworkManager = InstanceFinder.NetworkManager;
+            Comms = GetComponent<DissonanceComms>();
             Instance = this;
             ManageNetworkEvents(true);
             LoggingHelper.Logger.Info("FishNet comms initialized successfully!");
@@ -47,11 +48,6 @@ namespace Dissonance.Integrations.FishNet
             ManageNetworkEvents(false);
         }
 
-        internal void InitializeDissonanceComms()
-        {
-            Comms = GetComponent<DissonanceComms>();
-        }
-        
         protected override void Initialize()
 		{
             // Register no broadcast handler so errors can be captured easier

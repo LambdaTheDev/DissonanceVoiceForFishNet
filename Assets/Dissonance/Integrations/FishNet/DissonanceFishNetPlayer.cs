@@ -1,3 +1,4 @@
+using System;
 using Dissonance.Integrations.FishNet.Utils;
 using FishNet.Connection;
 using FishNet.Object;
@@ -17,8 +18,9 @@ namespace Dissonance.Integrations.FishNet
         private string _syncedPlayerName;
 
         // Captured DissonanceComms instance
-        private DissonanceComms _comms;
-
+        public DissonanceComms Comms { get; private set; }
+        
+        
         public string PlayerId => _syncedPlayerName;
         public Vector3 Position => trackingTransform.position;
         public Quaternion Rotation => trackingTransform.rotation;
@@ -57,8 +59,16 @@ namespace Dissonance.Integrations.FishNet
             }
 
             // Configure Player name
-            SetPlayerName(fishNetComms.Comms.LocalPlayerName);
             fishNetComms.Comms.LocalPlayerNameChanged += SetPlayerName;
+            if (fishNetComms.Comms.LocalPlayerName == null)
+            {
+                string randomGuid = Guid.NewGuid().ToString();
+                fishNetComms.Comms.LocalPlayerName = randomGuid;
+            }
+            else
+            {
+                SetPlayerName(fishNetComms.Comms.LocalPlayerName);
+            }
         }
 
         private void SetPlayerName(string playerName)
