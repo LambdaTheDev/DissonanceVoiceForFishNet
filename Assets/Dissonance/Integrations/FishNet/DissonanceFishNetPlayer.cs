@@ -14,14 +14,13 @@ namespace Dissonance.Integrations.FishNet
         [SerializeField] private Transform trackingTransform;
         
         // SyncVar ensures that all observers know player ID, even late joiners
-        [SyncVar(ReadPermissions = ReadPermission.Observers, OnChange = nameof(OnSyncedPlayerNameUpdated))] 
-        private string _syncedPlayerName;
+        private readonly SyncVar<string> _syncedPlayerName = new (settings: new SyncTypeSettings(WritePermission.ServerOnly, ReadPermission.Observers));
 
         // Captured DissonanceComms instance
         public DissonanceComms Comms { get; private set; }
         
         
-        public string PlayerId => _syncedPlayerName;
+        public string PlayerId => _syncedPlayerName.Value;
         public Vector3 Position => trackingTransform.position;
         public Quaternion Rotation => trackingTransform.rotation;
         public NetworkPlayerType Type => IsOwner ? NetworkPlayerType.Local : NetworkPlayerType.Remote;
@@ -77,7 +76,7 @@ namespace Dissonance.Integrations.FishNet
             if (IsTracking) ManageTrackingState(false);
             
             // Update name & re-enable tracking
-            _syncedPlayerName = playerName;
+            _syncedPlayerName.Value = playerName;
             ManageTrackingState(true);
             
             // And if owner, sync name over network
@@ -87,7 +86,7 @@ namespace Dissonance.Integrations.FishNet
         [ServerRpc(RequireOwnership = true)]
         private void ServerRpcSetPlayerName(string playerName)
         {
-            _syncedPlayerName = playerName;
+            _syncedPlayerName.Value = playerName;
         }
 
         private void OnSyncedPlayerNameUpdated(string _, string updatedName, bool __)

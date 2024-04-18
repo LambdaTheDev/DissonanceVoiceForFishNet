@@ -11,7 +11,7 @@ namespace Dissonance.Integrations.FishNet.Demos.Players
         private void Awake()
         {
             InstanceFinder.SceneManager.OnClientLoadedStartScenes += SceneManagerOnOnClientLoadedStartScenes;
-            if(InstanceFinder.IsHost) SceneManagerOnOnClientLoadedStartScenes(InstanceFinder.ClientManager.Connection, true);
+            if(InstanceFinder.IsHostStarted) SceneManagerOnOnClientLoadedStartScenes(InstanceFinder.ClientManager.Connection, true);
         }
 
         private void SceneManagerOnOnClientLoadedStartScenes(NetworkConnection arg1, bool arg2)

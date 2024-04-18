@@ -79,7 +79,7 @@ namespace Dissonance.Integrations.FishNet.Demos.Utils
         private void ServerManager_OnServerConnectionState(ServerConnectionStateArgs obj)
         {
             if (obj.ConnectionState != LocalConnectionState.Started) return;
-            if (_startingAsHost && !_networkManager.IsHost)
+            if (_startingAsHost && !_networkManager.IsHostStarted)
             {
                 StartCoroutine(DelayedLoadScene());
                 return;
@@ -92,7 +92,7 @@ namespace Dissonance.Integrations.FishNet.Demos.Utils
         {
             int attempts = 10;
             
-            while (attempts > 0 && !_networkManager.IsHost)
+            while (attempts > 0 && !_networkManager.IsHostStarted)
             {
                 attempts--;
                 yield return new WaitForSeconds(1f);

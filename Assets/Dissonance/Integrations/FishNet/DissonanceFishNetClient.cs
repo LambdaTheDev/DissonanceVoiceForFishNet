@@ -65,7 +65,7 @@ namespace Dissonance.Integrations.FishNet
 		protected override void ReadMessages() { }
 
 		// Callback when Dissonance broadcasts arrives
-		private void OnDissonanceDataReceived(DissonanceFishNetBroadcast broadcast)
+		private void OnDissonanceDataReceived(DissonanceFishNetBroadcast broadcast, Channel channel)
 		{
 			NetworkReceivedPacket(broadcast.Payload);
 			broadcast.ReleaseBuffer();

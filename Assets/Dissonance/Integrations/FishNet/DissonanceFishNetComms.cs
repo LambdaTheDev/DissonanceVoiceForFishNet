@@ -166,7 +166,7 @@ namespace Dissonance.Integrations.FishNet
                 Stop();
                 
                 if (isClientOnly) LoggingHelper.StoppingAs(NetworkMode.Client);
-                else LoggingHelper.StoppingAs(NetworkManager.IsHost ? NetworkMode.Host : NetworkMode.DedicatedServer);
+                else LoggingHelper.StoppingAs(NetworkManager.IsHostStarted ? NetworkMode.Host : NetworkMode.DedicatedServer);
             }
         }
 
@@ -175,8 +175,8 @@ namespace Dissonance.Integrations.FishNet
         
         #region Debugging
 
-        internal static void NullBroadcastReceivedHandler(NetworkConnection source, DissonanceFishNetBroadcast broadcast) => NullBroadcastLogger(broadcast);
-        internal static void NullBroadcastReceivedHandler(DissonanceFishNetBroadcast broadcast) => NullBroadcastLogger(broadcast);
+        internal static void NullBroadcastReceivedHandler(NetworkConnection source, DissonanceFishNetBroadcast broadcast, Channel channel) => NullBroadcastLogger(broadcast);
+        internal static void NullBroadcastReceivedHandler(DissonanceFishNetBroadcast broadcast, Channel channel) => NullBroadcastLogger(broadcast);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void NullBroadcastLogger(DissonanceFishNetBroadcast broadcast)

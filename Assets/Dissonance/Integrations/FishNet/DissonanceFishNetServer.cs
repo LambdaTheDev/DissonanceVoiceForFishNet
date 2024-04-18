@@ -70,7 +70,7 @@ namespace Dissonance.Integrations.FishNet
 		protected override void ReadMessages() { }
 
 		// Callback when Dissonance broadcast arrives
-		private void OnDissonanceDataReceived(NetworkConnection connection, DissonanceFishNetBroadcast broadcast)
+		private void OnDissonanceDataReceived(NetworkConnection connection, DissonanceFishNetBroadcast broadcast, Channel channel)
 		{
 			// Wrap FishNet connection into Dissonance one, pass a packet & release buffer
 			DissonanceFishNetConnection dissonanceConn = new DissonanceFishNetConnection(connection);
