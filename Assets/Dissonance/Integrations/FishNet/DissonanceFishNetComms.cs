@@ -146,7 +146,7 @@ namespace Dissonance.Integrations.FishNet
                 LoggingHelper.RunningAs(_currentNetworkMode);
             }
             
-            // If client only & dirty, stop client
+            // If client only & dirty, start dissonance
             else if(NetworkManager.ClientManager.Started)
             {
                 if (_currentNetworkMode == NetworkMode.Client) return;
