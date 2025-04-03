@@ -9,20 +9,20 @@ using FishNet.Transporting;
 
 namespace Dissonance.Integrations.FishNet
 {
-	// Comms implementation for Dissonance Voice. Used Unit, due to FishNet is connected while using Dissonance Voice
-	public sealed class DissonanceFishNetComms : BaseCommsNetwork<DissonanceFishNetServer, DissonanceFishNetClient, DissonanceFishNetConnection, Unit, Unit>
-	{
-		public static DissonanceFishNetComms Instance { get; private set; }
+    // Comms implementation for Dissonance Voice. Used Unit, due to FishNet is connected while using Dissonance Voice
+    public sealed class DissonanceFishNetComms : BaseCommsNetwork<DissonanceFishNetServer, DissonanceFishNetClient, DissonanceFishNetConnection, Unit, Unit>
+    {
+        public static DissonanceFishNetComms Instance { get; private set; }
 
-		public DissonanceComms Comms { get; private set; }
+        public DissonanceComms Comms { get; private set; }
         internal NetworkManager NetworkManager { get; private set; }
 
         private NetworkMode _currentNetworkMode = NetworkMode.None;
         private bool _subscribed;
 
 
-		private void Awake()
-		{
+        private void Awake()
+        {
             // Check if there is no double comms instance
             if (Instance != null)
             {
@@ -46,13 +46,17 @@ namespace Dissonance.Integrations.FishNet
         protected override void OnDisable()
         {
             ManageNetworkEvents(false);
+
+            base.OnDisable();
         }
 
         protected override void Initialize()
-		{
+	{
+            base.Initialize();
+	    
             // Register no broadcast handler so errors can be captured easier
             NetworkManager.ServerManager.RegisterBroadcast<DissonanceFishNetBroadcast>(NullBroadcastReceivedHandler);
-			NetworkManager.ClientManager.RegisterBroadcast<DissonanceFishNetBroadcast>(NullBroadcastReceivedHandler);
+            NetworkManager.ClientManager.RegisterBroadcast<DissonanceFishNetBroadcast>(NullBroadcastReceivedHandler);
             
             // Now, start Dissonance Voice, depending on current FishNet state
             // If not offline (FN is running), then it's gonna adjust to current FishNet's mode
@@ -60,17 +64,17 @@ namespace Dissonance.Integrations.FishNet
             AdjustDissonanceRunningMode();
         }
 
-		protected override DissonanceFishNetServer CreateServer(Unit connectionParameters)
-		{
+	protected override DissonanceFishNetServer CreateServer(Unit connectionParameters)
+	{
             LoggingHelper.Logger.Trace("Creating FishNet server...");
-			return new DissonanceFishNetServer(this);
-		}
+            return new DissonanceFishNetServer(this);
+        }
 
-		protected override DissonanceFishNetClient CreateClient(Unit connectionParameters)
-		{
+	protected override DissonanceFishNetClient CreateClient(Unit connectionParameters)
+        {
             LoggingHelper.Logger.Trace("Creating FishNet client...");
-			return new DissonanceFishNetClient(this);
-		}
+	    return new DissonanceFishNetClient(this);
+        }
 
         // Helper method that subscribes or unsubscribed 
         private void ManageNetworkEvents(bool subscribe)
